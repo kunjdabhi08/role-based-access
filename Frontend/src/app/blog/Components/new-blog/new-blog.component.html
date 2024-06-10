@@ -1,0 +1,36 @@
+<div class="d-flex gap-2 justify-content-center align-items-center pt-4">
+    <div class="w-50 d-flex justify-content-between align-items-center">
+        <h1>{{title}}</h1>
+        <button mat-raised-button color="accent" (click)="handleBack()">
+            < Back</button>
+    </div>
+</div>
+<form [formGroup]="blogForm" (submit)="handleSubmit()">
+    <div class="d-flex flex-column gap-2 justify-content-start align-items-center pt-4">
+        <div class="w-50">
+            <mat-form-field class="w-100">
+                <mat-label class="text-secondary">Title</mat-label>
+                <input  formControlName="title" matInput type="text">
+                <mat-error *ngIf="blogForm.get('title')?.touched && f['title'].errors?.['required']">
+                    Title is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <input type="text" formControlName="blogId" hidden />
+        <div class="w-50">
+            <mat-form-field class="w-100">
+                <mat-label class="text-secondary">Content</mat-label>
+                <textarea formControlName="content" placeholder="Content" matInput rows="15"></textarea>
+                <mat-error *ngIf="blogForm.get('content')?.touched && f['content'].errors?.['required']">
+                    Content is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="w-50">
+            <mat-slide-toggle formControlName="isPremium">Members Only</mat-slide-toggle>
+        </div>
+        <button mat-flat-button color="primary" class="w-50 mt-3" type="submit">
+            Submit
+        </button>
+    </div>
+</form>

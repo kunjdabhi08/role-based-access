@@ -1,0 +1,87 @@
+
+
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <h1>Blogs</h1>
+        @if(user.roleId === roleEnum.Author){
+            <button mat-flat-button class="btn btn-success" (click)="handleAddBlog()" color="primary">Add Blog</button>
+        }
+
+
+
+    </div>
+    
+
+    <div class="container mt-5">
+        
+        <mat-form-field class="w-25">
+            <mat-label>Search by Title, Author</mat-label>
+            <input matInput placeholder="Search" (keyup)="searchRecord($event)">
+        </mat-form-field>
+        
+        
+        <table mat-table [dataSource]="dataSource" matSort >
+            <ng-container matColumnDef="index">
+                <th mat-header-cell  class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Index </th>
+                <td mat-cell class="mat-body-1" *matCellDef="let e"> {{e.blogId}} </td>
+            </ng-container>
+            <ng-container matColumnDef="title">
+                <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Title </th>
+                <td mat-cell class="mat-body-1" *matCellDef="let e">
+                    <div class="d-flex align-items-center">
+                        @if(e.isPremium && user.roleId === roleEnum.Reader){
+                            <mat-icon fontIcon="lock" class="me-2" >icon</mat-icon>
+                        }
+                        <span>{{e.title}}</span> 
+                    </div>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="author"> 
+                <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Author </th>
+                <td mat-cell class="mat-body-1" *matCellDef="let e"> {{e.authorName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="date"> 
+                <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Written Date </th>
+                <td mat-cell class="mat-body-1" *matCellDef="let e"> {{e.createdAt | date}} </td>
+            </ng-container>
+            <ng-container matColumnDef="approved" > 
+                <th mat-header-cell class="mat-h2 fw-medium" [ngClass]="{'visually-hidden': user.roleId !== roleEnum.Author}" *matHeaderCellDef mat-sort-header> Approved </th>
+                <td mat-cell class="mat-body-1" [ngClass]="{'visually-hidden': user.roleId !== roleEnum.Author}" *matCellDef="let e"> {{e.isApproved ? "Yes" : "No"}} </td>
+            </ng-container>
+            <ng-container matColumnDef="premium" > 
+                <th mat-header-cell class="mat-h2 fw-medium" [ngClass]="{'visually-hidden': user.roleId !== roleEnum.Author}" *matHeaderCellDef mat-sort-header> Premium </th>
+                <td mat-cell class="mat-body-1" [ngClass]="{'visually-hidden': user.roleId !== roleEnum.Author}" *matCellDef="let e"> {{e.isPremium ? "Yes" : "No"}} </td>
+            </ng-container>
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef>Actions</th>
+                <td  class="gap-2" mat-cell *matCellDef="let e">
+                    <div class="d-flex">
+
+                        @if(user.roleId === roleEnum.Author){
+                            <button mat-mini-fab class="" color="primary" (click)="handleEditBlog(e.blogId)">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-mini-fab class="ms-2" color="warn" (click)="handleDelete(e.blogId)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        } @else if(user.roleId === roleEnum.Reader || user.roleId === roleEnum.SubscribedReader){
+                            <button mat-mini-fab class="btn btn-success" color="primary"
+                            (click)="handleRead(e.blogId, e.isPremium)">
+                            <mat-icon>open_in_new</mat-icon>
+                        </button>
+                        }
+                    </div>
+                    </td> 
+            </ng-container>
+            
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons aria-label="Select page of users"></mat-paginator>
+        
+
+    
+    </div>
+    
+</div>

@@ -1,0 +1,20 @@
+
+
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Profile</h1>
+        <button mat-raised-button color="accent" (click)="goBack()">Back</button>
+    </div>
+    <div>
+        <h3>Name: {{user.name}}</h3>
+        <h3>Role: {{user.roleName}}</h3>
+        <h3>Email: {{user.email}}</h3>
+
+        @if(user.roleId === roleTypeEnum.Reader || user.roleId === roleTypeEnum.SubscribedReader ){
+            <div class="w-50">
+                <mat-slide-toggle [checked]="user.roleId === roleTypeEnum.SubscribedReader" (change)="handleChange($event.checked)">Subscribe</mat-slide-toggle>
+            </div>
+        }
+    </div>
+</div>

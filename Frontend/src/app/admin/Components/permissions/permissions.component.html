@@ -1,0 +1,34 @@
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Roles</h1>
+        <div class="d-flex gap-3">
+            <button mat-raised-button color="primary" routerLink="/admin">Manage Users</button>
+            <button mat-raised-button color="primary" routerLink="/admin/blogs">Manage Blogs</button>
+        </div>
+    </div>
+    
+    <table mat-table [dataSource]="dataSource" matSort >
+        <ng-container matColumnDef="index">
+            <th mat-header-cell  class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Index </th>
+            <td mat-cell class="mat-body-1" *matCellDef="let e"> {{e.roleId}} </td>
+        </ng-container>
+        <ng-container matColumnDef="roleName">
+            <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Role Name </th>
+            <td mat-cell class="mat-body-1" *matCellDef="let e">
+                    <span>{{e.roleName}}</span> 
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef>Actions</th>
+            <td  class=" gap-2" mat-cell *matCellDef="let e">
+                
+                <button mat-flat-button  (click)="handleManagePermission(e.roleId)" color="primary">Manage Permissions</button>
+                </td> 
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+
+</div>

@@ -1,0 +1,48 @@
+<div class="container">
+
+    
+        <h1 class="mt-5">{{permissions && permissions[0].roleName}} Permissions</h1>
+    
+    @for (item of permissions; track $index) {
+    <div class="d-flex flex-column mb-2">
+        <div>
+            <mat-checkbox class="" [indeterminate]="" checked="{{allPermission[$index]}}"
+                (change)="checkAll($event.checked, $index)">
+                <span class="fs-5">
+                    {{item.screenName}}
+
+                </span>
+            </mat-checkbox>
+        </div>
+        <div class="ms-5 d-flex flex-column">
+
+            <mat-checkbox class="example-margin" (change)="handleChange($event.checked, $index, 0)"
+                [checked]="item.accesses[0]">
+                Create
+            </mat-checkbox>
+            <mat-checkbox class="example-margin" (change)="handleChange($event.checked, $index, 1)"
+                [checked]="item.accesses[1]">
+                Edit
+            </mat-checkbox>
+            <mat-checkbox class="example-margin" (change)="handleChange($event.checked, $index, 2)"
+                [checked]="item.accesses[2]">
+                Delete
+            </mat-checkbox>
+            <mat-checkbox class="example-margin" (change)="handleChange($event.checked, $index, 3)"
+                [checked]="item.accesses[3]">
+                Read
+            </mat-checkbox>
+            <div class="d-flex">
+
+                @if(isEdited[$index]){
+                    <button mat-raised-button  color="primary" class="mt-2" (click)="savePermission($index)">Save</button>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+    <div class="d-flex gap-3">  
+        <button mat-raised-button routerLink="/admin/permissions" color="accent" class="mt-5">Back</button>
+    </div>
+</div>

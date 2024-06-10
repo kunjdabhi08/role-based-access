@@ -1,0 +1,94 @@
+<div class="d-flex container justify-content-center align-items-center min-vh-100">
+    <div class="container">
+        <mat-card class="">
+            <mat-card-header class="d-flex justify-content-center">
+                <mat-card-title class="text-center fs-3">Registration</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <form [formGroup]="signupForm" (submit)="handleSubmit()">
+                    <div class="d-flex flex-column gap-2 justify-content-start align-items-center pt-4">
+                        <div class="w-50">
+                            <mat-form-field class="w-100">
+                                <mat-label class="text-secondary">Name</mat-label>
+                                <input formControlName="name"  matInput type="text">
+                                <mat-error *ngIf="signupForm.get('name')?.touched && f['name'].errors?.['required']">
+                                    Name is required
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="w-50">
+                            <mat-form-field class="w-100">
+                                <mat-label class="text-secondary">Email</mat-label>
+                                <input formControlName="email" placeholder="Email" matInput type="email">
+                                <mat-error *ngIf="signupForm.get('email')?.touched && f['email'].errors?.['required']">
+                                    Email is required
+                                </mat-error>
+                                <mat-error *ngIf="signupForm.get('email')?.touched && f['email'].errors?.['email']">
+                                    Enter valid email
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="w-50">
+                            <mat-form-field class="w-100">
+                                <mat-label class="text-secondary">Enter your password</mat-label>
+                                <input formControlName="password" matInput [type]="hide ? 'password' : 'text'">
+
+                                <button mat-icon-button matSuffix (click)="clickEvent($event)"
+                                    [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                                </button>
+
+                                <mat-error class="text-start"
+                                    *ngIf="signupForm.get('password')?.touched && f['password'].errors?.['required']">
+                                    Password is required
+                                </mat-error>
+                                <mat-error class="text-start position-relative"
+                                    *ngIf="signupForm.get('password')?.touched && f['password'].errors?.['pattern']">
+                                    Password must contain an uppercase letter, a lowercase letter, one digit,  one special character & containe minimum 8 character long
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        
+                        <div class="w-50">
+                            <mat-form-field class="w-100">
+                                <mat-label class="text-secondary">Confirm Password</mat-label>
+                                <input formControlName="confirmPassword"  matInput  [type]="hide ? 'password' : 'text'" >
+                                <button mat-icon-button matSuffix (click)="clickEvent($event)"
+                                    [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                                </button>
+                                <mat-error *ngIf="signupForm.get('confirmPassword')?.touched && f['confirmPassword'].errors?.['required']">
+                                    Confirm Password is required
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="w-50">
+                            <mat-form-field class="w-100">
+                                <mat-label>Register as</mat-label>
+                                <mat-select formControlName="roleId" class="w-100">
+                                    <mat-option [value]="3">
+                                        Author
+                                    </mat-option>
+                                    <mat-option [value]="5">
+                                        Reader
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                
+                            <mat-error *ngIf="signupForm.get('roleId')?.touched && f['roleId'].errors?.['required']">
+                                Please select designation
+                            </mat-error>
+                        </div>
+
+                        <button mat-flat-button color="primary" class="w-50 mt-3" type="submit">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </mat-card-content>
+            <mat-card-actions class="d-flex flex-column gap-3 justify-content-center my-3">
+                <a routerLink="">Back to login</a>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</div>
