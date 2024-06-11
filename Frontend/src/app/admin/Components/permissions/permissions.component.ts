@@ -9,6 +9,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthServiceService } from '../../../auth/Services/Auth/auth-service.service';
 import { AccessModel } from '../../Models/access.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { PermissionEnum } from '../../enums/permission.enum';
 
 
 @Component({
@@ -45,7 +46,7 @@ export class PermissionsComponent {
   }
 
   public handleManagePermission = (roleId: number): void => {
-    if(!this.permission.accesses[3]){
+    if(!this.permission.accesses[PermissionEnum.Read]){
       this.snackbar.open("You don't have permission", "Ok", {
         verticalPosition: "top",
         horizontalPosition: "end"

@@ -4,6 +4,7 @@ import { BlogService } from '../../Services/blog.service';
 import { NavbarComponent } from '../../../shared/Components/navbar/navbar.component';
 import { BlogModel } from '../../Models/blog.model';
 import { MatButtonModule } from '@angular/material/button';
+import { ScreenEnum } from '../../../shared/enums/screen.enum';
 
 @Component({
   selector: 'app-blog',
@@ -26,7 +27,7 @@ export class BlogComponent implements OnInit {
   blog: BlogModel;
 
   private fetchBlogById = (id: number) => {
-    this.blogService.getBlog(1, id).subscribe({
+    this.blogService.getBlog(ScreenEnum.Blog, id).subscribe({
       next: (data)=> {
         this.blog = data.data;
       }, 

@@ -52,8 +52,10 @@ export class LoginComponent implements OnInit {
 
   public handleSubmit = () => {
     this.loginForm.markAllAsTouched();
+
     if (!this.loginForm.invalid) {
       this.authService.login(this.loginForm.value.email, this.loginForm.value.password).subscribe({
+
         next: (data: ResponseModel<User>) => {
           if (data.success) {
             this.authService.isAuth.next(true);
@@ -62,19 +64,23 @@ export class LoginComponent implements OnInit {
             localStorage.setItem('permission', JSON.stringify(data.permissions));
             if (data.data.roleId === roleTypeEnum.Reader || data.data.roleId === roleTypeEnum.SubscribedReader || data.data.roleId === roleTypeEnum.Author) {
               this.router.navigate(["/blog/blogs"])
-            } else if(data.data.roleId === roleTypeEnum.SuperAdmin) {
+            }
+            else if (data.data.roleId === roleTypeEnum.SuperAdmin) {
               this.router.navigate(["admin/"])
-            } else {
+            }
+            else {
               this.router.navigate(["admin/blogs"])
             }
           }
         },
+
         error: (err) => {
           this.snackbar.open(err.error.message, "Ok", {
             horizontalPosition: "end",
             verticalPosition: "top"
           })
         }
+        
       })
     }
   }

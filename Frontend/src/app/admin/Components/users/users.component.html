@@ -9,7 +9,7 @@
     
 
     <mat-form-field class="w-25">
-        <mat-label>Search by name, email, designation</mat-label>
+        <mat-label>Search by name, email</mat-label>
         <input matInput placeholder="Search" (keyup)="searchRecord($event)">
     </mat-form-field>
     <table mat-table [dataSource]="dataSource" matSort >
@@ -50,11 +50,8 @@
                 }
             </td> 
         </ng-container>
-        
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
     <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons aria-label="Select page of users"></mat-paginator>
-
-
 </div>

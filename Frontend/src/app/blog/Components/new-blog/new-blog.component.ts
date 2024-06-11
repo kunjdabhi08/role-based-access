@@ -12,6 +12,7 @@ import { User } from '../../../auth/Models/user.model';
 import { CommonModule } from '@angular/common';
 import { BlogService } from '../../Services/blog.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ScreenEnum } from '../../../shared/enums/screen.enum';
 
 
 
@@ -22,8 +23,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './new-blog.component.html',
   styleUrl: './new-blog.component.css'
 })
-
-
 
 export class NewBlogComponent {
 
@@ -57,7 +56,7 @@ export class NewBlogComponent {
 
   private patchData = () => {
     if(this.id > 0){
-      this.blogService.getBlog(1, this.id).subscribe({
+      this.blogService.getBlog(ScreenEnum.Blog, this.id).subscribe({
         next: (data) => {
           this.blogForm.patchValue({
             title: data.data.title,

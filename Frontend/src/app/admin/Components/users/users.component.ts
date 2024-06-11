@@ -13,6 +13,8 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { ScreenEnum } from '../../../shared/enums/screen.enum';
+import { PermissionEnum } from '../../enums/permission.enum';
 
 @Component({
   selector: 'app-users',
@@ -26,7 +28,7 @@ export class UsersComponent {
   permissions: AccessModel;
   users: User[];
   constructor(private userService: UserService, private authService: AuthServiceService, private router: Router, private snackbar: MatSnackBar){
-    this.permissions = this.authService.getPermission(4);
+    this.permissions = this.authService.getPermission(ScreenEnum.User);
   }
 
   displayedColumns:string[] = ["index", "name", "role","email" ,"subscriber", "actions"]
@@ -44,7 +46,7 @@ export class UsersComponent {
   }
 
   private fetchUsers = (): void=> {
-    if(!this.permissions.accesses[3]){
+    if(!this.permissions.accesses[PermissionEnum.Read]){
       this.router.navigate(["/forbidden"])
     }
     this.userService.getUsers().subscribe({
@@ -59,7 +61,7 @@ export class UsersComponent {
   }
 
   public handleDelete = (id: number): void => {
-    if(!this.permissions.accesses[2]){
+    if(!this.permissions.accesses[PermissionEnum.Delete]){
       this.snackbar.open("You don't have permission", "Ok", {
         verticalPosition: "top",
         horizontalPosition: "end"
@@ -68,7 +70,7 @@ export class UsersComponent {
     }
     
     if(confirm("are you sure?")){
-      this.userService.deleteUser(id, 4).subscribe({
+      this.userService.deleteUser(id, ScreenEnum.User).subscribe({
         next:(): void => {
           this.fetchUsers(); 
         },

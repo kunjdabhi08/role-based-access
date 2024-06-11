@@ -10,7 +10,7 @@
         <div class="w-50">
             <mat-form-field class="w-100">
                 <mat-label class="text-secondary">Title</mat-label>
-                <input  formControlName="title" matInput type="text">
+                <input  formControlName="title" [readonly]="id ? true : false " matInput type="text">
                 <mat-error *ngIf="blogForm.get('title')?.touched && f['title'].errors?.['required']">
                     Title is required
                 </mat-error>

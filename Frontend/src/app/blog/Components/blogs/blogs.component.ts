@@ -14,6 +14,8 @@ import { AuthServiceService } from '../../../auth/Services/Auth/auth-service.ser
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatFormField, MatInputModule } from '@angular/material/input';
+import { ScreenEnum } from '../../../shared/enums/screen.enum';
+import { PermissionEnum } from '../../../admin/enums/permission.enum';
 
 @Component({
   selector: 'app-blogs',
@@ -40,22 +42,28 @@ export class BlogsComponent implements OnInit {
   horizontalPosition: MatSnackBarHorizontalPosition = 'end';
   verticalPosition: MatSnackBarVerticalPosition = 'top';
 
-  displayedColumns: string[] = ['index', 'title', 'author', 'date', 'approved', 'premium' ,'actions'];
+  displayedColumns: string[] = ['index', 'title', 'author', 'date', 'approved', 'premium', 'actions'];
   roleEnum = roleTypeEnum;
 
-  
+
   user: User;
   permission: AccessModel;
+
   constructor(private blogService: BlogService, private router: Router, private _snackBar: MatSnackBar, private authService: AuthServiceService) {
     this.user = JSON.parse(localStorage.getItem('user'));
-    this.permission = authService.getPermission(1); 
+    if (this.user.roleId === roleTypeEnum.Reader || this.user.roleId === roleTypeEnum.SubscribedReader) {
+      this.permission = authService.getPermission(ScreenEnum.Blog)
+    } else {
+
+      this.permission = authService.getPermission(ScreenEnum.Author);
+    }
 
   }
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   ngOnInit(): void {
-    if(!this.permission.accesses[3]){
+    if (!this.permission.accesses[PermissionEnum.Read]) {
       this.router.navigate(["/forbidden"])
     }
     this.fetchBlogs();
@@ -78,10 +86,9 @@ export class BlogsComponent implements OnInit {
 
   }
 
-
   private fetchBlogs = (): void => {
     if (this.user.roleId === roleTypeEnum.Author) {
-      this.blogService.getByAuthor(this.user.id, 1).subscribe({
+      this.blogService.getByAuthor(this.user.id, ScreenEnum.Blog).subscribe({
         next: (data: any) => {
           if (data.statusCode && data.statusCode === 401) {
             localStorage.clear();
@@ -96,7 +103,7 @@ export class BlogsComponent implements OnInit {
         }
       })
     } else {
-      this.blogService.getBlogs(1, true).subscribe({
+      this.blogService.getBlogs(ScreenEnum.Blog, true).subscribe({
         next: (data: any) => {
           if (data.statusCode && data.statusCode === 401) {
             localStorage.clear();
@@ -114,7 +121,7 @@ export class BlogsComponent implements OnInit {
   }
 
   public handleDelete = (blogid: number): void => {
-    if(this.permission.accesses[2]){
+    if (!this.permission.accesses[PermissionEnum.Delete]) {
       this._snackBar.open("You don't have permission", "Ok", {
         verticalPosition: this.verticalPosition,
         horizontalPosition: this.horizontalPosition,
@@ -134,7 +141,7 @@ export class BlogsComponent implements OnInit {
   }
 
   public handleAddBlog = (): void => {
-    if(!this.permission.accesses[0]){
+    if (!this.permission.accesses[PermissionEnum.Create]) {
       this._snackBar.open("You don't have permission", "Ok", {
         verticalPosition: this.verticalPosition,
         horizontalPosition: this.horizontalPosition,
@@ -145,7 +152,7 @@ export class BlogsComponent implements OnInit {
   }
 
   public handleEditBlog = (blogId: number): void => {
-    if(!this.permission.accesses[1]){
+    if (!this.permission.accesses[PermissionEnum.Edit]) {
       this._snackBar.open("You don't have permission", "Ok", {
         verticalPosition: this.verticalPosition,
         horizontalPosition: this.horizontalPosition,

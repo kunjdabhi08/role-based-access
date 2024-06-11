@@ -6,6 +6,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthServiceService } from '../../../auth/Services/Auth/auth-service.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ScreenEnum } from '../../../shared/enums/screen.enum';
 
 @Component({
   selector: 'app-permission',
@@ -24,7 +25,7 @@ export class PermissionComponent {
   
   constructor(private route: ActivatedRoute, private accessService: AccessService, private authService: AuthServiceService, private snackbar: MatSnackBar) {
     this.id = Number(this.route.snapshot.paramMap.get('id'))
-    this.permission = this.authService.getPermission(3);
+    this.permission = this.authService.getPermission(ScreenEnum.Permission);
     this.fetchPermission()
   }
 

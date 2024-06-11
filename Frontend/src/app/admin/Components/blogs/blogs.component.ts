@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginator } from '@angular/material/paginator';
@@ -17,6 +17,8 @@ import { MatSort, MatSortHeader, MatSortModule } from '@angular/material/sort';
 import { DatePipe } from '@angular/common';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ScreenEnum } from '../../../shared/enums/screen.enum';
+import { PermissionEnum } from '../../enums/permission.enum';
 
 @Component({
   selector: 'app-blogs',
@@ -38,7 +40,7 @@ import { MatInputModule } from '@angular/material/input';
   templateUrl: './blogs.component.html',
   styleUrl: './blogs.component.css'
 })
-export class BlogsComponent {
+export class BlogsComponent implements OnInit, AfterViewInit {
   horizontalPosition: MatSnackBarHorizontalPosition = 'end';
   verticalPosition: MatSnackBarVerticalPosition = 'top';
 
@@ -50,15 +52,14 @@ export class BlogsComponent {
   permission: AccessModel;
   constructor(private blogService: BlogService, private router: Router, private _snackBar: MatSnackBar, private authService: AuthServiceService) {
     this.user = JSON.parse(localStorage.getItem('user'));
-    this.permission = authService.getPermission(5); 
-
+    this.permission = authService.getPermission(ScreenEnum.Admin);
   }
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   ngOnInit(): void {
-    if(!this.permission.accesses[3]){
+    if (!this.permission.accesses[PermissionEnum.Read]) {
       this.router.navigate(["/forbidden"])
     }
     this.fetchBlogs();
@@ -70,42 +71,41 @@ export class BlogsComponent {
   }
 
   private fetchBlogs = (): void => {
-      this.blogService.getBlogs(5, false).subscribe({
-        next: (data: any) => {
-          if (data.statusCode && data.statusCode === 401) {
-            localStorage.clear();
-            this.router.navigate([""]);
-          }
-          this.blogs = data.data;
-          this.dataSource.data = data.data;
-          
-        },
-        error: (err) => {
-          alert(err.error.message)
+    this.blogService.getBlogs(ScreenEnum.Admin, false).subscribe({
+      next: (data: any) => {
+        if (data.statusCode && data.statusCode === 401) {
+          localStorage.clear();
+          this.router.navigate([""]);
         }
-      })
-    
+        this.blogs = data.data;
+        this.dataSource.data = data.data;
+
+      },
+      error: (err) => {
+        alert(err.error.message)
+      }
+    })
+
   }
 
   public handleApprove = (blogId: number): void => {
-    if(!this.permission.accesses[1]){
+    if (!this.permission.accesses[PermissionEnum.Edit]) {
       this._snackBar.open("You don't have permission", "Ok", {
         verticalPosition: this.verticalPosition,
         horizontalPosition: this.horizontalPosition,
       })
       return;
     }
-    if(confirm("Are you sure?")){
-
-      this.blogService.approveBlog(blogId, 5).subscribe({
-        next: ()=> {
+    if (confirm("Are you sure?")) {
+      this.blogService.approveBlog(blogId, ScreenEnum.Admin).subscribe({
+        next: () => {
           this._snackBar.open("Blog approved", "Ok", {
             horizontalPosition: "end",
             verticalPosition: "top"
           });
           this.fetchBlogs();
-        }, 
-        error: (e)=> {
+        },
+        error: (e) => {
           alert(e.error.message);
         }
       })
@@ -113,7 +113,7 @@ export class BlogsComponent {
   }
 
   public handleDelete = (blogid: number): void => {
-    if(!this.permission.accesses[2]){
+    if (!this.permission.accesses[PermissionEnum.Delete]) {
       this._snackBar.open("You don't have permission", "Ok", {
         verticalPosition: this.verticalPosition,
         horizontalPosition: this.horizontalPosition,
@@ -133,8 +133,8 @@ export class BlogsComponent {
   }
 
   public handleFilterChange = (checked: boolean): void => {
-    if(checked){
-      this.blogs = this.dataSource.data.filter((blog)=> blog.isApproved === false);
+    if (checked) {
+      this.blogs = this.dataSource.data.filter((blog) => blog.isApproved === false);
       this.dataSource.data = this.blogs;
     } else {
       this.fetchBlogs();
@@ -151,5 +151,5 @@ export class BlogsComponent {
     }
   }
 
-  
+
 }

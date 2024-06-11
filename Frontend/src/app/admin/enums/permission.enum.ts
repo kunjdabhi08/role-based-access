@@ -2,7 +2,7 @@
 
 
 
-enum PermissionEnum  {
+export enum PermissionEnum  {
     Create,
     Edit,
     Delete,

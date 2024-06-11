@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ResponseModel } from '../../../Models/Response.model';
 import { User } from '../../Models/user.model';
 import { Router } from '@angular/router';
+import { AccessModel } from '../../../admin/Models/access.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,35 +15,31 @@ export class AuthServiceService {
 
   public isAuth = new BehaviorSubject<boolean>(false);
 
-  
-  constructor(private http: HttpClient, private router:Router) { 
-  }
+  constructor(private http: HttpClient, private router: Router) {}
 
-  public isLoggedIn = ():boolean => {
+  public isLoggedIn = (): boolean => {
     var token = localStorage.getItem('token');
     var user = localStorage.getItem('user');
-    
-    if(user && token){
+    if (user && token) {
       return true;
     }
     return false;
-  } 
+  }
 
-  public getPermission = (screenId: number) => {
+  public getPermission = (screenId: number): AccessModel => {
     var permissions = JSON.parse(localStorage.getItem('permission'));
-    for(let i=0;i<permissions.length;i++){
-      if(permissions[i].screenId === screenId){
+    for (let i = 0; i < permissions.length; i++) {
+      if (permissions[i].screenId === screenId) {
         return permissions[i];
       }
     }
-    
+    return null;
+
   }
 
-  
-  
-  public autoLogin = () => {
+  public autoLogin = (): void => {
     var token = localStorage.getItem('token');
-    if(token){
+    if (token) {
       this.router.navigate(["blog/blogs"]);
       this.isAuth.next(true);
     }
