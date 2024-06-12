@@ -8,7 +8,6 @@ import { Router, RouterLink } from '@angular/router';
 import { User } from '../../../auth/Models/user.model';
 import { roleTypeEnum } from '../../../shared/enums/role.enum';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { AccessModel } from '../../../admin/Models/access.model';
 import { AuthServiceService } from '../../../auth/Services/Auth/auth-service.service';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -16,6 +15,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatFormField, MatInputModule } from '@angular/material/input';
 import { ScreenEnum } from '../../../shared/enums/screen.enum';
 import { PermissionEnum } from '../../../admin/enums/permission.enum';
+import { CommonService } from '../../../shared/Services/common.service';
 
 @Component({
   selector: 'app-blogs',
@@ -36,31 +36,26 @@ import { PermissionEnum } from '../../../admin/enums/permission.enum';
   styleUrl: './blogs.component.css'
 })
 export class BlogsComponent implements OnInit {
+
   dataSource = new MatTableDataSource<BlogModel>();
   blogs: BlogModel[];
-
-  horizontalPosition: MatSnackBarHorizontalPosition = 'end';
-  verticalPosition: MatSnackBarVerticalPosition = 'top';
-
   displayedColumns: string[] = ['index', 'title', 'author', 'date', 'approved', 'premium', 'actions'];
   roleEnum = roleTypeEnum;
-
-
   user: User;
   permission: AccessModel;
 
-  constructor(private blogService: BlogService, private router: Router, private _snackBar: MatSnackBar, private authService: AuthServiceService) {
-    this.user = JSON.parse(localStorage.getItem('user'));
-    if (this.user.roleId === roleTypeEnum.Reader || this.user.roleId === roleTypeEnum.SubscribedReader) {
-      this.permission = authService.getPermission(ScreenEnum.Blog)
-    } else {
-
-      this.permission = authService.getPermission(ScreenEnum.Author);
-    }
-
-  }
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+
+  constructor(private blogService: BlogService, private router: Router, private authService: AuthServiceService, private commonService: CommonService) {
+    this.user = this.authService.getUser();
+    if (this.user.roleId === roleTypeEnum.Reader || this.user.roleId === roleTypeEnum.SubscribedReader) {
+      this.permission = this.authService.getPermission(ScreenEnum.Blog)
+    } else {
+
+      this.permission = this.authService.getPermission(ScreenEnum.Author);
+    }
+  }
 
   ngOnInit(): void {
     if (!this.permission.accesses[PermissionEnum.Read]) {
@@ -78,10 +73,7 @@ export class BlogsComponent implements OnInit {
     if (isPremium == true && this.user.roleId === roleTypeEnum.SubscribedReader || isPremium == false) {
       this.router.navigate([`/blog/read/${id}`])
     } else {
-      this._snackBar.open("Subscribe to read this blog", "Ok", {
-        horizontalPosition: this.horizontalPosition,
-        verticalPosition: this.verticalPosition
-      })
+      this.commonService.openSnackBar("Subscribe to read this blog");
     }
 
   }
@@ -91,7 +83,7 @@ export class BlogsComponent implements OnInit {
       this.blogService.getByAuthor(this.user.id, ScreenEnum.Blog).subscribe({
         next: (data: any) => {
           if (data.statusCode && data.statusCode === 401) {
-            localStorage.clear();
+            sessionStorage.clear();
             this.router.navigate([""]);
           }
           this.dataSource.data = data.data;
@@ -106,7 +98,7 @@ export class BlogsComponent implements OnInit {
       this.blogService.getBlogs(ScreenEnum.Blog, true).subscribe({
         next: (data: any) => {
           if (data.statusCode && data.statusCode === 401) {
-            localStorage.clear();
+            sessionStorage.clear();
             this.router.navigate([""]);
           }
 
@@ -122,10 +114,7 @@ export class BlogsComponent implements OnInit {
 
   public handleDelete = (blogid: number): void => {
     if (!this.permission.accesses[PermissionEnum.Delete]) {
-      this._snackBar.open("You don't have permission", "Ok", {
-        verticalPosition: this.verticalPosition,
-        horizontalPosition: this.horizontalPosition,
-      })
+      this.commonService.openForbiddenDialog();
       return;
     }
     if (confirm("Are you sure")) {
@@ -142,10 +131,7 @@ export class BlogsComponent implements OnInit {
 
   public handleAddBlog = (): void => {
     if (!this.permission.accesses[PermissionEnum.Create]) {
-      this._snackBar.open("You don't have permission", "Ok", {
-        verticalPosition: this.verticalPosition,
-        horizontalPosition: this.horizontalPosition,
-      })
+      this.commonService.openForbiddenDialog();
       return;
     }
     this.router.navigate(["/blog/add"]);
@@ -153,15 +139,11 @@ export class BlogsComponent implements OnInit {
 
   public handleEditBlog = (blogId: number): void => {
     if (!this.permission.accesses[PermissionEnum.Edit]) {
-      this._snackBar.open("You don't have permission", "Ok", {
-        verticalPosition: this.verticalPosition,
-        horizontalPosition: this.horizontalPosition,
-      })
+      this.commonService.openForbiddenDialog();
       return;
     }
     this.router.navigate([`/blog/edit/${blogId}`])
   }
-
 
   public searchRecord = (event): void => {
     let search: string = event.target.value;
@@ -172,5 +154,4 @@ export class BlogsComponent implements OnInit {
       this.dataSource.data = this.blogs
     }
   }
-
 }

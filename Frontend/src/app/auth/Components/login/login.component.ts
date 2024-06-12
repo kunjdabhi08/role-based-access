@@ -12,30 +12,35 @@ import { AuthServiceService } from '../../Services/Auth/auth-service.service';
 import { ResponseModel } from '../../../Models/Response.model';
 import { User } from '../../Models/user.model';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { roleTypeEnum } from '../../../shared/enums/role.enum';
-Router
+import { CommonService } from '../../../shared/Services/common.service';
+import * as CryptoJS from 'crypto-js';
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [MatInputModule, MatButtonModule, MatIconModule, FormsModule, CommonModule, ReactiveFormsModule, MatCardModule, RouterLink],
+  imports: [
+    MatInputModule, 
+    MatButtonModule, 
+    MatIconModule, 
+    FormsModule, 
+    CommonModule, 
+    ReactiveFormsModule, 
+    MatCardModule, 
+    RouterLink
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
+
 export class LoginComponent implements OnInit {
   public hide = true;
   public permissionError!: string;
-  public clickEvent(event: MouseEvent) {
-    event.preventDefault();
-    this.hide = !this.hide;
-    event.stopPropagation();
-  }
-  constructor(private authService: AuthServiceService, private router: Router, private route: ActivatedRoute, private snackbar: MatSnackBar) {
+  public loginForm!: FormGroup;
+ 
+  constructor(private authService: AuthServiceService, private router: Router, private route: ActivatedRoute,  private commonService: CommonService) {
     authService.autoLogin();
   }
-
-  public loginForm!: FormGroup;
-
 
 
   ngOnInit(): void {
@@ -45,12 +50,18 @@ export class LoginComponent implements OnInit {
     })
   }
 
+  public clickEvent = (event: MouseEvent): void => {
+    event.preventDefault();
+    this.hide = !this.hide;
+    event.stopPropagation();
+  }
+
 
   public get f() {
     return this.loginForm.controls
   }
 
-  public handleSubmit = () => {
+  public handleSubmit = ():void => {
     this.loginForm.markAllAsTouched();
 
     if (!this.loginForm.invalid) {
@@ -59,8 +70,8 @@ export class LoginComponent implements OnInit {
         next: (data: ResponseModel<User>) => {
           if (data.success) {
             this.authService.isAuth.next(true);
-            localStorage.setItem('user', JSON.stringify(data.data));
-            localStorage.setItem('token', JSON.stringify(data.token));
+            sessionStorage.setItem('token', JSON.stringify(data.token));
+            sessionStorage.setItem('user', this.commonService.encrypt(JSON.stringify(data.data)));
             localStorage.setItem('permission', JSON.stringify(data.permissions));
             if (data.data.roleId === roleTypeEnum.Reader || data.data.roleId === roleTypeEnum.SubscribedReader || data.data.roleId === roleTypeEnum.Author) {
               this.router.navigate(["/blog/blogs"])
@@ -73,14 +84,9 @@ export class LoginComponent implements OnInit {
             }
           }
         },
-
         error: (err) => {
-          this.snackbar.open(err.error.message, "Ok", {
-            horizontalPosition: "end",
-            verticalPosition: "top"
-          })
+          this.commonService.openSnackBar(err.error.message);
         }
-        
       })
     }
   }

@@ -1,71 +1,71 @@
-
-
 <div class="container mt-5">
 
-  
-        <div class="d-flex justify-content-between align-items-center mt-4">
-            <h1>Blogs</h1>
-            <div class="d-flex gap-3">
-                <button mat-raised-button color="primary" routerLink="/admin">Manage Users</button>
-                <button mat-raised-button color="primary" routerLink="/admin/permissions">Manage Permissions</button>
-            </div>
-        </div>
 
-    
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <h1>Blogs</h1>
+        <div class="d-flex gap-3">
+            <button mat-raised-button color="primary" routerLink="/admin">Manage Users</button>
+            <button mat-raised-button color="primary" routerLink="/admin/permissions">Manage Permissions</button>
+        </div>
+    </div>
+
+
 
     <div class="container mt-5">
-         <mat-form-field class="w-25">
-            <mat-label>Search by name, email, designation</mat-label>
+        <mat-form-field class="w-25">
+            <mat-label>Search by Title, Author</mat-label>
             <input matInput placeholder="Search" (keyup)="searchRecord($event)">
-        </mat-form-field> 
-            <mat-checkbox (change)="handleFilterChange($event.checked)">
-                Unapproved Blogs
-            </mat-checkbox>
-        <table mat-table [dataSource]="dataSource" matSort >
+        </mat-form-field>
+        <mat-checkbox (change)="handleFilterChange($event.checked)">
+            Unapproved Blogs
+        </mat-checkbox>
+        <table mat-table [dataSource]="dataSource" matSort>
             <ng-container matColumnDef="index">
-                <th mat-header-cell  class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Index </th>
-                <td mat-cell class="mat-body-1" *matCellDef="let e"> {{e.blogId}} </td>
+                <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Index </th>
+                <td mat-cell class="mat-body-1" *matCellDef="let e; let i = index"> {{this.paginator.pageIndex == 0 ? i
+                    + 1 : 1 + i + this.paginator.pageIndex * this.paginator.pageSize}} </td>
             </ng-container>
             <ng-container matColumnDef="title">
                 <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Title </th>
                 <td mat-cell class="mat-body-1" *matCellDef="let e">
                     <div class="d-flex align-items-center">
                         @if(e.isPremium){
-                            <mat-icon fontIcon="lock" class="me-2" >icon</mat-icon>
+                        <mat-icon fontIcon="lock" class="me-2">icon</mat-icon>
                         }
-                        <span>{{e.title}}</span> 
+                        <span>{{e.title}}</span>
                     </div>
                 </td>
             </ng-container>
-            <ng-container matColumnDef="author"> 
+            <ng-container matColumnDef="author">
                 <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Author </th>
                 <td mat-cell class="mat-body-1" *matCellDef="let e"> {{e.authorName}} </td>
             </ng-container>
-            <ng-container matColumnDef="date"> 
+            <ng-container matColumnDef="date">
                 <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Written Date </th>
-                <td mat-cell class="mat-body-1" *matCellDef="let e">  {{e.createdAt | date}}</td>
+                <td mat-cell class="mat-body-1" *matCellDef="let e"> {{e.createdAt | date}}</td>
             </ng-container>
             <ng-container matColumnDef="actions">
                 <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef>Actions</th>
-                <td  class=" gap-2" mat-cell *matCellDef="let e">
+                <td class=" gap-2" mat-cell *matCellDef="let e">
                     @if(!e.isApproved){
-                        <button mat-mini-fab class="btn btn-danger ms-2" color="primary" (click)="handleApprove(e.blogId)">
-                            <mat-icon>done</mat-icon>
-                        </button>
+                    <button mat-mini-fab class="btn btn-danger ms-2" color="primary" (click)="handleApprove(e.blogId)">
+                        <mat-icon>done</mat-icon>
+                    </button>
                     }
                     <button mat-mini-fab class="btn btn-danger ms-2" color="warn" (click)="handleDelete(e.blogId)">
                         <mat-icon>delete</mat-icon>
                     </button>
-                    
-                    </td> 
+
+                </td>
             </ng-container>
             
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-            <mat-paginator  [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons aria-label="Select page of users"></mat-paginator>
-        
-        
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons
+            aria-label="Select page of users"></mat-paginator>
+
+
     </div>
-    
+
 </div>

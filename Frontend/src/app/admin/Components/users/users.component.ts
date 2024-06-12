@@ -15,11 +15,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { ScreenEnum } from '../../../shared/enums/screen.enum';
 import { PermissionEnum } from '../../enums/permission.enum';
+import { CommonService } from '../../../shared/Services/common.service';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [MatTableModule, MatButtonModule, RouterLink, MatPaginatorModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule  ],
+  imports: [MatTableModule, MatButtonModule, RouterLink, MatPaginatorModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
@@ -27,14 +28,19 @@ export class UsersComponent {
   dataSource = new MatTableDataSource<User>();
   permissions: AccessModel;
   users: User[];
-  constructor(private userService: UserService, private authService: AuthServiceService, private router: Router, private snackbar: MatSnackBar){
+  constructor(
+    private userService: UserService, 
+    private authService: AuthServiceService, 
+    private router: Router,  
+    private commonService: CommonService,
+  ) {
     this.permissions = this.authService.getPermission(ScreenEnum.User);
   }
 
-  displayedColumns:string[] = ["index", "name", "role","email" ,"subscriber", "actions"]
+  displayedColumns: string[] = ["index", "name", "role", "email", "subscriber", "actions"]
 
   ngOnInit(): void {
-    
+
     this.fetchUsers();
   }
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -45,40 +51,40 @@ export class UsersComponent {
     this.dataSource.sort = this.sort;
   }
 
-  private fetchUsers = (): void=> {
-    if(!this.permissions.accesses[PermissionEnum.Read]){
+  private fetchUsers = (): void => {
+    if (!this.permissions.accesses[PermissionEnum.Read]) {
       this.router.navigate(["/forbidden"])
     }
     this.userService.getUsers().subscribe({
-      next: (data)=> {
+      next: (data) => {
         this.users = data.data;
         this.dataSource.data = data.data;
       },
       error: (e) => {
-        alert(e.error.message);
+        this.commonService.openSnackBar(e.error.message);
       }
     })
   }
 
   public handleDelete = (id: number): void => {
-    if(!this.permissions.accesses[PermissionEnum.Delete]){
-      this.snackbar.open("You don't have permission", "Ok", {
-        verticalPosition: "top",
-        horizontalPosition: "end"
-      })
+    if (!this.permissions.accesses[PermissionEnum.Delete]) {
+      this.commonService.openForbiddenDialog();
       return;
     }
-    
-    if(confirm("are you sure?")){
-      this.userService.deleteUser(id, ScreenEnum.User).subscribe({
-        next:(): void => {
-          this.fetchUsers(); 
-        },
-        error:(e):void => {
-          alert(e.error.message);
-        }
-      })
-    }
+
+    const confirm = this.commonService.takeConfirmation();
+    confirm.beforeClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        this.userService.deleteUser(id, ScreenEnum.User).subscribe({
+          next: (): void => {
+            this.fetchUsers();
+          },
+          error: (e): void => {
+            this.commonService.openSnackBar(e.error.message);
+          }
+        })
+      }
+    })
   }
 
   public searchRecord = (event): void => {

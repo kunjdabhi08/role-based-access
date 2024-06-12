@@ -14,27 +14,33 @@ import { ScreenEnum } from '../../../shared/enums/screen.enum';
   styleUrl: './blog.component.css'
 })
 export class BlogComponent implements OnInit {
-
-  constructor(private route: ActivatedRoute, private blogService: BlogService) {
-    
-  }
+  blog: BlogModel;
   id:number;
+
+  constructor(
+    private route: ActivatedRoute, 
+    private blogService: BlogService
+  ) {}
+
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'))
     this.fetchBlogById(this.id)
   }
 
-  blog: BlogModel;
-
   private fetchBlogById = (id: number) => {
     this.blogService.getBlog(ScreenEnum.Blog, id).subscribe({
       next: (data)=> {
         this.blog = data.data;
+        this.blog.content = JSON.parse(this.blog.content);
       }, 
       error: (err)=> {
         alert(err.error.message);
       }
     })
+  }
+
+  public parseJson = (content: string): string => {
+    return JSON.parse(content);
   }
 
 }

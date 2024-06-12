@@ -1,38 +1,33 @@
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
-import { User } from '../../../auth/Models/user.model';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthServiceService } from '../../../auth/Services/Auth/auth-service.service';
+import { Observable } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, RouterLink],
+  imports: [MatButtonModule, MatIconModule, RouterLink, CommonModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
- 
-  public loggedin: boolean;
-  user: User;
-  
 
+  public isLoggedIn$: Observable<boolean>;
   constructor(private router: Router, private authService: AuthServiceService) {}
 
   ngOnInit(): void {
-    this.loggedin = this.authService.isAuth.value;
-    console.log(this.loggedin)
-    if(this.loggedin){
-      this.user = JSON.parse(localStorage.getItem('user'));
+    this.isLoggedIn$ = this.authService.isAuth;
+    if(this.authService.getUser()){
+      this.authService.isAuth.next(true);
     }
   }
 
-
   public handleLogout = (): void => {
-    localStorage.clear();
+    sessionStorage.clear();
     this.router.navigate([""]);
     this.authService.isAuth.next(false);
   }
-
 }

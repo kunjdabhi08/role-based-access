@@ -6,52 +6,54 @@
             <button mat-raised-button color="primary" routerLink="/admin/permissions">Manage Permissions</button>
         </div>
     </div>
-    
+
 
     <mat-form-field class="w-25">
         <mat-label>Search by name, email</mat-label>
         <input matInput placeholder="Search" (keyup)="searchRecord($event)">
     </mat-form-field>
-    <table mat-table [dataSource]="dataSource" matSort >
+    <table mat-table [dataSource]="dataSource" matSort>
         <ng-container matColumnDef="index">
-            <th mat-header-cell  class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Index </th>
-            <td mat-cell class="mat-body-1" *matCellDef="let e"> {{e.id}} </td>
+            <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Index </th>
+            <td mat-cell class="mat-body-1" *matCellDef="let e; let i = index"> {{this.paginator.pageIndex == 0 ? i + 1
+                : 1 + i + this.paginator.pageIndex * this.paginator.pageSize}} </td>
         </ng-container>
         <ng-container matColumnDef="name">
             <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Name </th>
             <td mat-cell class="mat-body-1" *matCellDef="let e">
-                    <span>{{e.name}}</span> 
+                <span>{{e.name}}</span>
             </td>
         </ng-container>
         <ng-container matColumnDef="role">
             <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Role </th>
             <td mat-cell class="mat-body-1" *matCellDef="let e">
-                    <span>{{e.roleName}}</span> 
+                <span>{{e.roleName}}</span>
             </td>
         </ng-container>
         <ng-container matColumnDef="email">
             <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Email </th>
             <td mat-cell class="mat-body-1" *matCellDef="let e">
-                    <span>{{e.email}}</span> 
+                <span>{{e.email}}</span>
             </td>
         </ng-container>
         <ng-container matColumnDef="subscriber">
             <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef mat-sort-header> Subscriber </th>
             <td mat-cell class="mat-body-1" *matCellDef="let e">
-                    <span>{{(e.roleId === 4 || e.roleId === 5) ? e.isSubscribed ? "Yes" : "No" : "-"}}</span> 
+                <span>{{(e.roleId === 4 || e.roleId === 5) ? e.isSubscribed ? "Yes" : "No" : "-"}}</span>
             </td>
         </ng-container>
         <ng-container matColumnDef="actions">
             <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef>Actions</th>
-            <td  class=" gap-2" mat-cell *matCellDef="let e">
+            <td class=" gap-2" mat-cell *matCellDef="let e">
                 @if(e.roleId !== 1){
-                    <button mat-mini-fab  color="warn" (click)="handleDelete(e.id)">
+                <button mat-mini-fab color="warn" (click)="handleDelete(e.id)">
                     <mat-icon>delete</mat-icon></button>
                 }
-            </td> 
+            </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons aria-label="Select page of users"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons
+        aria-label="Select page of users"></mat-paginator>
 </div>

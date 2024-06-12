@@ -3,8 +3,7 @@
    
         enum RoleTypeEnum
         {
-            None,
-            SuperAdmin,
+            SuperAdmin = 1,
             Admin,
             Author,
             SubscribedReader,

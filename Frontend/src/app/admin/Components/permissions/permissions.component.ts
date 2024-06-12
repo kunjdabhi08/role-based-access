@@ -8,8 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
 import { AuthServiceService } from '../../../auth/Services/Auth/auth-service.service';
 import { AccessModel } from '../../Models/access.model';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { PermissionEnum } from '../../enums/permission.enum';
+import { CommonService } from '../../../shared/Services/common.service';
 
 
 @Component({
@@ -22,12 +22,12 @@ import { PermissionEnum } from '../../enums/permission.enum';
 export class PermissionsComponent {
 
   dataSource: RoleModel[];
-  displayedColumns: string[] = ["index", "roleName" , "actions"];
+  displayedColumns: string[] = ["index", "roleName", "actions"];
   permission: AccessModel;
 
-  constructor(private accessService: AccessService, private roleService: RoleService, private router: Router, private authService: AuthServiceService, private snackbar: MatSnackBar) {
+  constructor(private roleService: RoleService, private router: Router, private authService: AuthServiceService,  private commonService: CommonService) {
     this.permission = this.authService.getPermission(3);
-  } 
+  }
 
 
   ngOnInit(): void {
@@ -40,17 +40,14 @@ export class PermissionsComponent {
         this.dataSource = data.data;
       },
       error: (err) => {
-        alert(err.error.message);
+        this.commonService.openSnackBar(err.error.message);
       }
     })
   }
 
   public handleManagePermission = (roleId: number): void => {
-    if(!this.permission.accesses[PermissionEnum.Read]){
-      this.snackbar.open("You don't have permission", "Ok", {
-        verticalPosition: "top",
-        horizontalPosition: "end"
-      })
+    if (!this.permission.accesses[PermissionEnum.Read]) {
+      this.commonService.openForbiddenDialog();
       return;
     }
     this.router.navigate([`/admin/permission/${roleId}`])

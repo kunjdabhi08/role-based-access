@@ -1,5 +1,5 @@
-@if(true){
-<nav class="navbar navbar-expand-lg navbar-light shadow-sm px-5" color="primary">
+
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm px-5" *ngIf="isLoggedIn$ | async as isLoggedIn" color="primary">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">BlogNinja</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -25,4 +25,3 @@
         </div>
     </div>
 </nav>
-}

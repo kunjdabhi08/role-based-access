@@ -13,6 +13,7 @@ import { AuthServiceService } from '../../Services/Auth/auth-service.service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { CommonService } from '../../../shared/Services/common.service';
 
 @Component({
   selector: 'app-register',
@@ -21,6 +22,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
+
 export class RegisterComponent implements OnInit {
   public hide = true;
   public clickEvent = (event: MouseEvent): void => {
@@ -29,7 +31,11 @@ export class RegisterComponent implements OnInit {
     event.stopPropagation();
   }
 
-  constructor(private authService: AuthServiceService, private router: Router, private snackbar: MatSnackBar) { }
+  constructor (
+    private authService: AuthServiceService, 
+    private router: Router,  
+    private commonService: CommonService
+  ) { }
 
   signupForm!: FormGroup;
 
@@ -56,10 +62,7 @@ export class RegisterComponent implements OnInit {
           this.router.navigate([""]);
         },
         error: (err) => {
-          this.snackbar.open(err.error.message, "Ok", {
-            horizontalPosition: "end",
-            verticalPosition: "top"
-          })
+          this.commonService.openSnackBar(err.error.message);
         }
       })
     }

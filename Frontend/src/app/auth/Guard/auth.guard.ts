@@ -2,10 +2,13 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthServiceService } from '../Services/Auth/auth-service.service';
 import { User } from '../Models/user.model';
+import { CommonService } from '../../shared/Services/common.service';
+
 
 export const authGuard: CanActivateFn = (route, state) => {
 
   const authService: AuthServiceService = inject(AuthServiceService);
+  const commonService: CommonService = inject(CommonService);
   const router: Router = inject(Router);
 
 
@@ -14,7 +17,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  let user: User = JSON.parse(localStorage.getItem('user'));
+  let user: User = JSON.parse(commonService.decrypt(sessionStorage.getItem('user')));
 
   let allowedRoles: number[] = route.data["roles"] as number[];
 
