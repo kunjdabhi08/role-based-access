@@ -20,6 +20,6 @@ namespace DataAccess.Models.DTO
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         public string? ConfirmPassword { get; set; }
 
-        public int? roleId { get; set; }
+        public int? RoleId { get; set; }
     }
 }

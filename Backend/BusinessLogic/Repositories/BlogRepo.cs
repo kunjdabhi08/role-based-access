@@ -24,7 +24,7 @@ namespace BusinessLogic.Repositories
                 CreatedDate = DateTime.UtcNow,
                 LastModifiedDate = DateTime.UtcNow,
                 IsApproved = false,
-                IsPremium = blog.isPremium,
+                IsPremium = blog.IsPremium,
             };
 
             await _dbContext.Blogs.AddAsync(b);
@@ -53,7 +53,7 @@ namespace BusinessLogic.Repositories
                 Title = blog.Title,
                 Content = blog.Content,
                 IsApproved = blog.IsApproved,
-                isPremium = blog.IsPremium,
+                IsPremium = blog.IsPremium,
                 AuthorName = blog.Author.Name,
                 AuthorId = blog.AuthorId,
                 BlogId = blog.BlogId,
@@ -76,7 +76,7 @@ namespace BusinessLogic.Repositories
                     Title = blog.Title,
                     Content = blog.Content,
                     IsApproved = blog.IsApproved,
-                    isPremium = blog.IsPremium,
+                    IsPremium = blog.IsPremium,
                     AuthorName = (await _dbContext.Authors.FirstOrDefaultAsync(author => author.AuthorId == blog.AuthorId)).Name,
                     AuthorId = blog.AuthorId,
                     CreatedAt = blog.CreatedDate.Date,
@@ -96,7 +96,7 @@ namespace BusinessLogic.Repositories
             {
                 blogToEdit.Title = blog.Title;
                 blogToEdit.Content = blog.Content;
-                blogToEdit.IsPremium = blog.isPremium;
+                blogToEdit.IsPremium = blog.IsPremium;
 
                 _dbContext.Blogs.Update(blogToEdit);
                 await _dbContext.SaveChangesAsync();

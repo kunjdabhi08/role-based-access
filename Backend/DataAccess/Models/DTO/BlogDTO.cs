@@ -27,7 +27,7 @@ namespace DataAccess.Models.DTO
 
         public bool IsApproved { get; set; }
 
-        public bool isPremium { get; set; }
+        public bool IsPremium { get; set; }
 
         public DateTime? CreatedAt { get; set; }
     }

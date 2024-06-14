@@ -1,7 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Router } from '@angular/router';
-import { NavbarComponent } from './shared/Components/navbar/navbar.component';
+import { NavbarComponent } from './common/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +12,7 @@ import { NavbarComponent } from './shared/Components/navbar/navbar.component';
 export class AppComponent{
   title = 'Frontend';
 
-  constructor(private router: Router) {
+  constructor() {
     
   }
 

@@ -42,10 +42,10 @@ namespace Backend.Controllers
                         throw new Exception("Something Went Wrong");
                     }
 
-                    User u = await _auth.Register(user);
+                    User registeredUser = await _auth.Register(user);
 
                     response.Success = true;
-                    response.Data = u;
+                    response.Data = registeredUser;
 
                     return Ok(response);
                 }
@@ -84,8 +84,8 @@ namespace Backend.Controllers
                     throw new Exception("Something went wrong");
                 }
 
-                UserRespDTO? u =await _auth.Login(email, password);
-                if (u == null)
+                UserRespDTO? loggedInUser =await _auth.Login(email, password);
+                if (loggedInUser == null)
                 {
                     res.Success = false;
                     res.Message = "User does not exist";
@@ -93,9 +93,9 @@ namespace Backend.Controllers
                     return NotFound(res);
                 }
 
-                string token = _jwt.GenerateToken(email, u.RoleName, (int)u.RoleId);
+                string token = _jwt.GenerateToken(email, loggedInUser.RoleName, (int)loggedInUser.RoleId);
                 res.Success = true;
-                res.Data = u;
+                res.Data = loggedInUser;
                 res.Token = token;
                 return Ok(res);
 

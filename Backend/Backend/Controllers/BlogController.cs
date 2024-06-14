@@ -42,9 +42,9 @@ namespace Backend.Controllers
                         throw new Exception("Something went wrong");
                     }
 
-                    Blog b = await _blog.Create(blog);
+                    Blog createdBlog = await _blog.Create(blog);
                     res.Success = true;
-                    res.Data = b;
+                    res.Data = createdBlog;
 
                     return Ok(res);
                 }
@@ -61,13 +61,12 @@ namespace Backend.Controllers
 
         /// <summary>
         /// will return blogs based on conditions. it is used for getting for user and for admin.
-        /// if user makes request, user will get only approved blogs,
-        /// if admin makes request, admin will get all the blogs including unapproved blogs
+        /// if user makes request, user will get only approved blogs
         /// </summary>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <param name="user">user is boolean field which will be true if user makes request</param>
         /// <returns></returns>
-        [CustomAuth("View")]
+        [CustomAuth]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -143,9 +142,9 @@ namespace Backend.Controllers
             ResponseDTO<Blog> res = new ResponseDTO<Blog>();
             try
             {
-                Blog? b = await _blog.Edit(blog);
+                Blog? editedBlogs = await _blog.Edit(blog);
 
-                if (b == null)
+                if (editedBlogs == null)
                 {
                     res.Success = false;
                     res.Message = "Blog does not exist";
@@ -153,7 +152,7 @@ namespace Backend.Controllers
                 }
 
                 res.Success = true;
-                res.Data = b;
+                res.Data = editedBlogs;
                 return Ok(res);
             }
             catch (Exception Ex)
@@ -181,9 +180,9 @@ namespace Backend.Controllers
             ResponseDTO<NoContent> res = new ResponseDTO<NoContent>();
             try
             {
-                Blog? b = await _blog.Delete(id);
+                Blog? deletedBlog = await _blog.Delete(id);
 
-                if (b == null)
+                if (deletedBlog == null)
                 {
                     res.Success = false;
                     res.Message = "Blog does not exist";
@@ -245,9 +244,9 @@ namespace Backend.Controllers
             ResponseDTO<Blog> res = new ResponseDTO<Blog>();
             try
             {
-                Blog? b = await _blog.Approve(blogId);
+                Blog? approvedBlog = await _blog.Approve(blogId);
 
-                if (b == null)
+                if (approvedBlog == null)
                 {
                     res.Success = false;
                     res.Message = "Blog does not exist";
@@ -255,7 +254,7 @@ namespace Backend.Controllers
                 }
 
                 res.Success = true;
-                res.Data = b;
+                res.Data = approvedBlog;
                 return Ok(res);
             }
             catch (Exception Ex)

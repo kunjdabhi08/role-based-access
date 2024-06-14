@@ -25,7 +25,7 @@ namespace BusinessLogic.Repositories
             {
                 Name = user.Name,
                 Email = user.Email,
-                RoleId = user.roleId == (int)RoleTypeEnum.Author ? 3 : 5,
+                RoleId = user.RoleId == (int)RoleTypeEnum.Author ? (int)RoleTypeEnum.Author : (int)RoleTypeEnum.Reader,
                 Password = BCrypt.Net.BCrypt.HashPassword(user.Password, salt),
                 CreatedAt = DateTime.UtcNow,
 
@@ -79,7 +79,7 @@ namespace BusinessLogic.Repositories
                     user.RoleId = loginUser.RoleId;
                     user.RoleName =  _dbContext.Roles.FirstOrDefault(role => role.RoleId == loginUser.RoleId)?.RoleName;
 
-                    if(loginUser.RoleId == 3)
+                    if(loginUser.RoleId == (int)RoleTypeEnum.Author)
                     {
                         user.AuthorId =  _dbContext.Authors.FirstOrDefault(author=> author.UserId == loginUser.UserId)?.AuthorId;
                     }

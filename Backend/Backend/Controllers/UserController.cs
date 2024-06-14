@@ -34,9 +34,9 @@ namespace Backend.Controllers
             ResponseDTO<NoContent> res = new ResponseDTO<NoContent>();
             try
             {
-                User? u = await _user.Delete(id);
+                User? deleteUser = await _user.Delete(id);
 
-                if (u == null)
+                if (deleteUser == null)
                 {
                     res.Success = false;
                     res.Message = "User does not exist";
