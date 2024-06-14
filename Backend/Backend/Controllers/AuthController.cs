@@ -22,7 +22,11 @@ namespace Backend.Controllers
 
         }
 
-        
+        /// <summary>
+        /// this method will register user and add data to the database
+        /// </summary>
+        /// <param name="user">user will containe data of the user added by user</param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -57,6 +61,15 @@ namespace Backend.Controllers
 
         }
 
+
+        /// <summary>
+        /// this method is for logging user in.
+        /// it will match email and password and if matches it will return the user object which will caontain token and other details.
+        /// if not matches it will return badrequest with error message, same if user is not found.
+        /// </summary>
+        /// <param name="email">email of the user</param>
+        /// <param name="password">password of the user</param>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

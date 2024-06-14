@@ -22,7 +22,6 @@ namespace BusinessLogic.Common
             var jwtServices = context.HttpContext.RequestServices.GetService<IJwtRepo>();
             var accessService = context.HttpContext.RequestServices.GetService<IAccessRepo>();
 
-            var sc = context.HttpContext.Request.Query["screenId"];
 
             if (jwtServices == null || accessService == null)
             {
@@ -81,19 +80,24 @@ namespace BusinessLogic.Common
 
             var roleType = roleClaim.Value;
 
-            Access access = accessService.Get(int.Parse(roleType), int.Parse(sc));
 
-            if (access != null && (_access.Contains("Create") && access?.Create == false || _access.Contains("Edit") && access?.Edit == false || _access.Contains("View") && access?.View == false || _access.Contains("Delete") && access?.Delete == false))
+            if (_access.Length > 0)
             {
-                context.Result = new JsonResult(new
+                var sc = context.HttpContext.Request.Query["screenId"];
+                Access access = accessService.Get(int.Parse(roleType), int.Parse(sc));
+
+                if (access != null && (_access.Contains("Create") && access?.Create == false || _access.Contains("Edit") && access?.Edit == false || _access.Contains("View") && access?.View == false || _access.Contains("Delete") && access?.Delete == false))
                 {
-                    Success = false,
-                    Message = "Permission Denied"
-                })
-                {
-                    StatusCode = 403
-                };
-                return;
+                    context.Result = new JsonResult(new
+                    {
+                        Success = false,
+                        Message = "Permission Denied"
+                    })
+                    {
+                        StatusCode = 403
+                    };
+                    return;
+                }
             }
 
         }

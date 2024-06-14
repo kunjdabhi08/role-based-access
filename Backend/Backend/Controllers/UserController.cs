@@ -17,6 +17,13 @@ namespace Backend.Controllers
             _user = user;
         }
 
+
+        /// <summary>
+        /// this method is for deleting a user.
+        /// </summary>
+        /// <param name="id">id of the user to be deleted</param>
+        /// <param name="screenId">will contain id of the screen from which request has been made</param>
+        /// <returns></returns>
         [CustomAuth("Delete")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -47,6 +54,11 @@ namespace Backend.Controllers
             }
         }
 
+
+        /// <summary>
+        /// this method will return all the users in database and is not  deleted.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [CustomAuth("View")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -69,6 +81,14 @@ namespace Backend.Controllers
             }
         }
 
+
+        /// <summary>
+        /// this method will change the role of subscribed user to unsubscribed user if subscribe is false
+        /// and will change unsubscribe to subscribe if subscribe param is true.
+        /// </summary>
+        /// <param name="id">id of the user which will be subscribed or unsubscribed</param>
+        /// <param name="subscribe">if true then request for subscription and if false then request for unsubscription</param>
+        /// <returns></returns>
         [HttpPost("{id:int}")]
         [CustomAuth("View")]
         [ProducesResponseType(StatusCodes.Status200OK)]

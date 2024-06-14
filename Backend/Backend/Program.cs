@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,35 +25,7 @@ builder.Services.AddDbContext<AppDBContext>(option =>
     option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 }, ServiceLifetime.Transient);
 
-builder.Services.AddAuthentication(opt =>
-{
-    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(opt =>
-{
-    opt.RequireHttpsMetadata = false; 
-    opt.SaveToken = true;
-    opt.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"])),
-        ValidateIssuer = false,
-        ValidateLifetime = true,
-        ValidateAudience = false,
-    };
-    opt.Events = new JwtBearerEvents
-    {
-        OnAuthenticationFailed = context =>
-        {
-            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-            {
-                context.Response.Headers.Add("Token-Expired", "true");
-            }   
-            return Task.CompletedTask;
-        }
-    };
-});
+
 
 builder.Services.AddSwaggerGen(opt =>
 {
@@ -81,6 +54,9 @@ builder.Services.AddSwaggerGen(opt =>
             new string[]{}
         }
     });
+
+
+
 });
 
 builder.Services.AddScoped<IAuthRepo, AuthRepo>();
