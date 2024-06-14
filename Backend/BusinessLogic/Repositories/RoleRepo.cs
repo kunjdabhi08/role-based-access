@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BusinessLogic.Interfaces;
 using DataAccess.Data;
 using DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Repositories
 {
@@ -18,10 +19,10 @@ namespace BusinessLogic.Repositories
         }
 
 
-        public List<Role> Get()
+        public async Task<List<Role>> Get()
         {
-            return _dbContext.Roles.ToList();
-        } 
+            return await _dbContext.Roles.ToListAsync();
+        }
 
     }
 }

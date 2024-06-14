@@ -11,8 +11,8 @@ namespace BusinessLogic.Interfaces
 {
     public interface IAuthRepo
     {
-        public User Register(UserDTO user);
+        public Task<User> Register(UserDTO user);
 
-        public UserRespDTO? Login(string email, string password);
+        public Task<UserRespDTO>? Login(string email, string password);
     }
 }

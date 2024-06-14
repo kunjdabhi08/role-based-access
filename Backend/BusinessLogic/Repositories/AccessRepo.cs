@@ -3,6 +3,7 @@ using DataAccess.Models;
 using BusinessLogic.Interfaces;
 using DataAccess.Data;
 using DataAccess.Models.DTO;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Repositories
 {
@@ -16,51 +17,46 @@ namespace BusinessLogic.Repositories
 
         public Access? Get(int roleid, int screenid)
         {
-            Access? access = _dbContext.Accesses.FirstOrDefault(x=> x.RoleId == roleid && x.ScreenId == screenid);
+            Access? access =  _dbContext.Accesses.FirstOrDefault(acc=> acc.RoleId == roleid && acc.ScreenId == screenid);
             return access;
         }
 
 
-        public Access? Edit(int screenid, int roleid, bool[] editedAccess)
+        public async Task<List<AccessDTO>>? Edit(List<AccessDTO> accesses)
         {
-            Access? access = _dbContext.Accesses.FirstOrDefault(x=> x.RoleId == roleid && x.ScreenId == screenid);
-            if(access != null)
+            foreach(AccessDTO access in accesses)
             {
-                access.Create = editedAccess[0];
-                access.Edit = editedAccess[1];
-                access.Delete = editedAccess[2];
-                access.View = editedAccess[3];
+                Access? accessToEdit = await _dbContext.Accesses.FirstOrDefaultAsync(acc => acc.RoleId == access.RoleId && acc.ScreenId == access.ScreenId);
+                if (access != null)
+                {
+                    accessToEdit.Create = access.Create;
+                    accessToEdit.Edit = access.Edit;
+                    accessToEdit.Delete = access.Delete;
+                    accessToEdit.View = access.View;
 
-                _dbContext.Accesses.Update(access);
-                _dbContext.SaveChanges();
+                    _dbContext.Accesses.Update(accessToEdit);
+                    await _dbContext.SaveChangesAsync();
+                }
             }
+            
 
-            return access;
+            return accesses;
         }
 
-        public List<AccessDTO> Get()
-        {
-            List<AccessDTO> access = _dbContext.Accesses.Select(x=> new AccessDTO {
-                RoleId = x.RoleId,
-                ScreenId = x.ScreenId,
-                AccessId = x.AccessId,
-                Accesses = new bool[] {x.Create, x.Edit, x.Delete, x.View },
-                RoleName = x.Role.RoleName,
-                ScreenName = x.Screen.ScreenName
-            }).ToList();
-            return access;
-        }
         
-        public List<AccessDTO> Get(int roleId)
+        public async Task<List<AccessDTO>> Get(int roleId)
         {
-            List<AccessDTO> access = _dbContext.Accesses.Where(x=>x.RoleId == roleId).Select(x=> new AccessDTO {
-                AccessId = x.AccessId,
-                RoleId = x.RoleId,
-                ScreenId = x.ScreenId,
-                Accesses = new bool[] {x.Create, x.Edit, x.Delete, x.View },
-                RoleName = x.Role.RoleName,
-                ScreenName = x.Screen.ScreenName
-            }).ToList();
+            List<AccessDTO> access =  await _dbContext.Accesses.Where(acc => acc.RoleId == roleId).Select(acc => new AccessDTO {
+                AccessId = acc.AccessId,
+                RoleId = acc.RoleId,
+                ScreenId = acc.ScreenId,
+                RoleName = acc.Role.RoleName,
+                ScreenName = acc.Screen.ScreenName,
+                Create = acc.Create,
+                Delete = acc.Delete,
+                View = acc.View,
+                Edit = acc.Edit,
+            }).ToListAsync();
             return access;
         }
 

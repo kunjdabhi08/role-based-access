@@ -2,6 +2,7 @@
 using BusinessLogic.Interfaces;
 using DataAccess.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
+using BusinessLogic.Common;
 
 namespace Backend.Controllers
 {
@@ -21,11 +22,11 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<Access>> Edit(AccessDTO access)
+        public async Task<ActionResult<ResponseDTO<Access>>> Edit(List<AccessDTO> access)
         {
             if (ModelState.IsValid)
             { 
-                ResponseDTO<Access> res = new ResponseDTO<Access>();
+                ResponseDTO<List<AccessDTO>> res = new ResponseDTO<List<AccessDTO>>();
                 try
                 {
                     if (access == null)
@@ -33,43 +34,42 @@ namespace Backend.Controllers
                         throw new Exception("Something went wrong");
                     }
 
-                    Access editedAccess = _access.Edit(access.ScreenId, access.RoleId, access.Accesses);
+                    List<AccessDTO> editedAccess = await _access.Edit(access);
 
                     if (editedAccess == null)
                     {
                         res.Success = false;
                         res.Message = "Access Data not found";
 
-                        return NotFound(res);
+                        return  NotFound(res);
                     }
 
                     res.Success = true;
                     res.Data = editedAccess;
 
-                    return Ok(res);
+                    return  Ok(res);
                 }
                 catch (Exception ex)
                 {
                     res.Success = false;
                     res.Message = ex.Message;
 
-                    return BadRequest(res);
+                    return  BadRequest(res);
                 }
             }
             return BadRequest(ModelState);
         }
-
-
-        [HttpGet]
+        
+        [HttpGet("{roleid:int}")]
         [CustomAuth("View")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<List<AccessDTO>>> Get()
+        public async Task<ActionResult<ResponseDTO<List<AccessDTO>>>> Get(int roleid)
         {
             ResponseDTO<List<AccessDTO>> res = new ResponseDTO<List<AccessDTO>>();
             try
             {
-                List<AccessDTO> accesses = _access.Get();
+                List<AccessDTO> accesses = await _access.Get(roleid);
                 res.Success = true;
                 res.Data = accesses;
 
@@ -83,23 +83,27 @@ namespace Backend.Controllers
                 return BadRequest(res);
             }
         }
-        
-        [HttpGet("{roleid:int}")]
-        [CustomAuth("View")]
+
+        [HttpGet("{roleid:int}/{screenid:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<List<AccessDTO>>> Get(int roleid)
+        public  ActionResult<ResponseDTO<Access>> Get(int roleid, int screenid)
         {
-            ResponseDTO<List<AccessDTO>> res = new ResponseDTO<List<AccessDTO>>();
+            ResponseDTO<Access> res = new ResponseDTO<Access>();
             try
             {
-                List<AccessDTO> accesses = _access.Get(roleid);
-                res.Success = true;
-                res.Data = accesses;
+                Access access =  _access.Get(roleid, screenid);
+                if(access == null)
+                {
+                    throw new Exception("Something went wrong");
+                }
 
-                return Ok(res);
-            }
-            catch (Exception ex)
+                res.Success = true;
+                res.Data= access;
+
+                return res;
+
+            } catch(Exception ex)
             {
                 res.Success = false;
                 res.Message = ex.Message;

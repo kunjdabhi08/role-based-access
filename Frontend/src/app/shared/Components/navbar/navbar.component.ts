@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthServiceService } from '../../../auth/Services/Auth/auth-service.service';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { User } from '../../../auth/Models/user.model';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +16,10 @@ import { CommonModule } from '@angular/common';
 })
 export class NavbarComponent {
 
+  user: User;
+
   public isLoggedIn$: Observable<boolean>;
+
   constructor(private router: Router, private authService: AuthServiceService) {}
 
   ngOnInit(): void {
@@ -23,6 +27,7 @@ export class NavbarComponent {
     if(this.authService.getUser()){
       this.authService.isAuth.next(true);
     }
+    this.user = this.authService.getUser();
   }
 
   public handleLogout = (): void => {
@@ -30,4 +35,5 @@ export class NavbarComponent {
     this.router.navigate([""]);
     this.authService.isAuth.next(false);
   }
+  
 }

@@ -16,6 +16,7 @@ import { MatFormField, MatInputModule } from '@angular/material/input';
 import { ScreenEnum } from '../../../shared/enums/screen.enum';
 import { PermissionEnum } from '../../../admin/enums/permission.enum';
 import { CommonService } from '../../../shared/Services/common.service';
+import { PermissionModel } from '../../../admin/Models/permission.model';
 
 @Component({
   selector: 'app-blogs',
@@ -42,24 +43,26 @@ export class BlogsComponent implements OnInit {
   displayedColumns: string[] = ['index', 'title', 'author', 'date', 'approved', 'premium', 'actions'];
   roleEnum = roleTypeEnum;
   user: User;
-  permission: AccessModel;
+  permission: PermissionModel;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private blogService: BlogService, private router: Router, private authService: AuthServiceService, private commonService: CommonService) {
+  constructor(
+    private blogService: BlogService, 
+    private router: Router, 
+    private authService: AuthServiceService, 
+    private commonService: CommonService
+  ) {
     this.user = this.authService.getUser();
-    if (this.user.roleId === roleTypeEnum.Reader || this.user.roleId === roleTypeEnum.SubscribedReader) {
-      this.permission = this.authService.getPermission(ScreenEnum.Blog)
-    } else {
-
-      this.permission = this.authService.getPermission(ScreenEnum.Author);
-    }
+   
   }
 
   ngOnInit(): void {
-    if (!this.permission.accesses[PermissionEnum.Read]) {
-      this.router.navigate(["/forbidden"])
+    if (this.user.roleId === roleTypeEnum.Reader || this.user.roleId === roleTypeEnum.SubscribedReader) {
+      this.fetchPermsisionForScreen(this.user.roleId, ScreenEnum.Blog)
+      } else {
+        this.fetchPermsisionForScreen(this.user.roleId, ScreenEnum.Author)
     }
     this.fetchBlogs();
   }
@@ -75,62 +78,29 @@ export class BlogsComponent implements OnInit {
     } else {
       this.commonService.openSnackBar("Subscribe to read this blog");
     }
-
   }
 
-  private fetchBlogs = (): void => {
-    if (this.user.roleId === roleTypeEnum.Author) {
-      this.blogService.getByAuthor(this.user.id, ScreenEnum.Blog).subscribe({
-        next: (data: any) => {
-          if (data.statusCode && data.statusCode === 401) {
-            sessionStorage.clear();
-            this.router.navigate([""]);
-          }
-          this.dataSource.data = data.data;
-          this.blogs = data.data;
-        },
-
-        error: (err) => {
-          alert(err.error.message)
-        }
-      })
-    } else {
-      this.blogService.getBlogs(ScreenEnum.Blog, true).subscribe({
-        next: (data: any) => {
-          if (data.statusCode && data.statusCode === 401) {
-            sessionStorage.clear();
-            this.router.navigate([""]);
-          }
-
-          this.dataSource.data = data.data;
-          this.blogs = data.data;
-        },
-        error: (err) => {
-          alert(err.error.message)
-        }
-      })
-    }
-  }
-
+  
   public handleDelete = (blogid: number): void => {
-    if (!this.permission.accesses[PermissionEnum.Delete]) {
+    if (!this.permission.delete) {
       this.commonService.openForbiddenDialog();
       return;
     }
-    if (confirm("Are you sure")) {
-      this.blogService.deleleBlog(blogid, 1).subscribe({
-        next: () => {
-          this.fetchBlogs();
-        },
-        error: (err) => {
-          alert(err.error.message)
-        }
-      })
-    }
+    const confirm = this.commonService.takeConfirmation();
+    confirm.beforeClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        this.blogService.deleleBlog(blogid, 1).subscribe({
+          next: () => {
+            this.commonService.openSnackBar("Blog deleted");
+            this.fetchBlogs();
+          }
+        })
+      }
+    })  
   }
 
   public handleAddBlog = (): void => {
-    if (!this.permission.accesses[PermissionEnum.Create]) {
+    if (!this.permission.create) {
       this.commonService.openForbiddenDialog();
       return;
     }
@@ -138,7 +108,7 @@ export class BlogsComponent implements OnInit {
   }
 
   public handleEditBlog = (blogId: number): void => {
-    if (!this.permission.accesses[PermissionEnum.Edit]) {
+    if (!this.permission.edit) {
       this.commonService.openForbiddenDialog();
       return;
     }
@@ -154,4 +124,43 @@ export class BlogsComponent implements OnInit {
       this.dataSource.data = this.blogs
     }
   }
+
+  private fetchPermsisionForScreen = (roleId: number, screenId:number): void => {
+    this.commonService.fetchPermissionForScreen(roleId, screenId).subscribe({
+      next: (data) => {
+        this.permission = data.data;
+        if (data.success && !data.data.view) {
+        this.router.navigate(["/forbidden"]) 
+        }
+      }
+    })
+  }
+
+  private fetchBlogs = (): void => {
+    if (this.user.roleId === roleTypeEnum.Author) {
+      this.blogService.getByAuthor(this.user.id, ScreenEnum.Blog).subscribe({
+        next: (data: any) => {
+          if (data.statusCode && data.statusCode === 401) {
+            sessionStorage.clear();
+            this.router.navigate([""]);
+          }
+          this.dataSource.data = data.data;
+          this.blogs = data.data;
+        }
+      })
+    } else {
+      this.blogService.getBlogs(ScreenEnum.Blog, true).subscribe({
+        next: (data: any) => {
+          if (data.statusCode && data.statusCode === 401) {
+            sessionStorage.clear();
+            this.router.navigate([""]);
+          }
+
+          this.dataSource.data = data.data;
+          this.blogs = data.data;
+        }
+      })
+    }
+  }
+
 }

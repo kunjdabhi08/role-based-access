@@ -16,58 +16,58 @@ import { MatIconModule } from '@angular/material/icon';
 import { ScreenEnum } from '../../../shared/enums/screen.enum';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { CommonService } from '../../../shared/Services/common.service';
+import { PermissionModel } from '../../Models/permission.model';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [MatTableModule, MatButtonModule, RouterLink, MatPaginatorModule, MatSortModule, MatFormFieldModule, MatInputModule, MatIconModule],
+  imports: [
+    MatTableModule, 
+    MatButtonModule, 
+    RouterLink, 
+    MatPaginatorModule, 
+    MatSortModule, 
+    MatFormFieldModule, 
+    MatInputModule, 
+    MatIconModule
+  ],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css'
 })
+
 export class UsersComponent {
   dataSource = new MatTableDataSource<User>();
-  permissions: AccessModel;
+  permission: PermissionModel;
   users: User[];
-  constructor(
-    private userService: UserService, 
-    private authService: AuthServiceService, 
-    private router: Router,  
-    private commonService: CommonService,
-  ) {
-    this.permissions = this.authService.getPermission(ScreenEnum.User);
-  }
-
+  user: User;
   displayedColumns: string[] = ["index", "name", "role", "email", "subscriber", "actions"]
 
-  ngOnInit(): void {
-
-    this.fetchUsers();
-  }
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+
+  constructor(
+    private userService: UserService,
+    private authService: AuthServiceService,
+    private router: Router,
+    private commonService: CommonService,
+  ) {
+    this.user = this.authService.getUser();
+  }
+
+  ngOnInit(): void {
+    this.fetchPermsisionForScreen(this.user.roleId, ScreenEnum.User);
+    this.fetchUsers();
+
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
-  private fetchUsers = (): void => {
-    if (!this.permissions.accesses[PermissionEnum.Read]) {
-      this.router.navigate(["/forbidden"])
-    }
-    this.userService.getUsers().subscribe({
-      next: (data) => {
-        this.users = data.data;
-        this.dataSource.data = data.data;
-      },
-      error: (e) => {
-        this.commonService.openSnackBar(e.error.message);
-      }
-    })
-  }
 
   public handleDelete = (id: number): void => {
-    if (!this.permissions.accesses[PermissionEnum.Delete]) {
+    if (!this.permission.delete) {
       this.commonService.openForbiddenDialog();
       return;
     }
@@ -78,9 +78,7 @@ export class UsersComponent {
         this.userService.deleteUser(id, ScreenEnum.User).subscribe({
           next: (): void => {
             this.fetchUsers();
-          },
-          error: (e): void => {
-            this.commonService.openSnackBar(e.error.message);
+            this.commonService.openSnackBar("User deleted");
           }
         })
       }
@@ -95,5 +93,26 @@ export class UsersComponent {
     else {
       this.dataSource.data = this.users;
     }
+  }
+
+  
+  private fetchUsers = (): void => {
+    this.userService.getUsers().subscribe({
+      next: (data) => {
+        this.users = data.data;
+        this.dataSource.data = data.data;
+      }
+    })
+  }
+
+  private fetchPermsisionForScreen = (roleId: number, screenId: number): void => {
+    this.commonService.fetchPermissionForScreen(roleId, screenId).subscribe({
+      next: (data) => {
+        this.permission = data.data;
+        if (data.success && !data.data.view) {
+          this.router.navigate(["/forbidden"])
+        }
+      }
+    })
   }
 }

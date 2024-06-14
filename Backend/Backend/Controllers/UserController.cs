@@ -3,6 +3,7 @@ using DataAccess.Models.DTO;
 using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using BusinessLogic.Common;
 
 namespace Backend.Controllers
 {
@@ -11,7 +12,8 @@ namespace Backend.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepo _user;
-        public UserController(IUserRepo user) { 
+        public UserController(IUserRepo user)
+        {
             _user = user;
         }
 
@@ -20,12 +22,12 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<ResponseDTO<NoContent>> Delete(int id, int screenId)
+        public async Task<ActionResult<ResponseDTO<NoContent>>> Delete(int id, int screenId)
         {
             ResponseDTO<NoContent> res = new ResponseDTO<NoContent>();
             try
             {
-                User? u = _user.Delete(id);
+                User? u = await _user.Delete(id);
 
                 if (u == null)
                 {
@@ -45,16 +47,16 @@ namespace Backend.Controllers
             }
         }
 
-
         [HttpGet]
+        [CustomAuth("View")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<List<UserRespDTO>>> Get()
+        public async Task<ActionResult<ResponseDTO<List<UserRespDTO>>>> Get()
         {
             ResponseDTO<List<UserRespDTO>> res = new ResponseDTO<List<UserRespDTO>>();
             try
             {
-                List<UserRespDTO> users = _user.Get();
+                List<UserRespDTO> users = await _user.Get();
                 res.Success = true;
                 res.Data = users;
                 return Ok(res);
@@ -67,16 +69,16 @@ namespace Backend.Controllers
             }
         }
 
-
         [HttpPost("{id:int}")]
+        [CustomAuth("View")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<NoContent>> Subscribe(int id, int subscribe)
+        public async Task<ActionResult<ResponseDTO<NoContent>>> Subscribe(int id, int subscribe)
         {
-            ResponseDTO<List<UserRespDTO>> res = new ResponseDTO<List<UserRespDTO>>();
+            ResponseDTO<NoContent> res = new ResponseDTO<NoContent>();
             try
             {
-                _user.Subscribe(id, subscribe);
+                await _user.Subscribe(id, subscribe);
                 res.Success = true;
                 return Ok(res);
             }

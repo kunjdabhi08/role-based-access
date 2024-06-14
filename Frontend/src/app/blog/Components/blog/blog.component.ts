@@ -27,20 +27,17 @@ export class BlogComponent implements OnInit {
     this.fetchBlogById(this.id)
   }
 
+  public parseJson = (content: string): string => {
+    return JSON.parse(content);
+  }
+
   private fetchBlogById = (id: number) => {
     this.blogService.getBlog(ScreenEnum.Blog, id).subscribe({
       next: (data)=> {
         this.blog = data.data;
         this.blog.content = JSON.parse(this.blog.content);
-      }, 
-      error: (err)=> {
-        alert(err.error.message);
       }
     })
-  }
-
-  public parseJson = (content: string): string => {
-    return JSON.parse(content);
   }
 
 }

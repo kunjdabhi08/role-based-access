@@ -1,9 +1,9 @@
 ﻿using DataAccess.Models;
 using BusinessLogic.Interfaces;
 using DataAccess.Models.DTO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using BusinessLogic.Common;
 
 namespace Backend.Controllers
 {
@@ -22,7 +22,7 @@ namespace Backend.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<Blog>> Create(BlogDTO blog, int screenId)
+        public async Task<ActionResult<ResponseDTO<Blog>>> Create(BlogDTO blog, int screenId)
         {
             if (ModelState.IsValid)
             {
@@ -35,7 +35,7 @@ namespace Backend.Controllers
                         throw new Exception("Something went wrong");
                     }
 
-                    Blog b = _blog.Create(blog);
+                    Blog b = await _blog.Create(blog);
                     res.Success = true;
                     res.Data = b;
 
@@ -55,12 +55,12 @@ namespace Backend.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<List<Blog>>> Get(int screenId, bool user)
+        public async Task<ActionResult<ResponseDTO<List<Blog>>>> Get(int screenId, bool user)
         {
             ResponseDTO<List<BlogDTO>> res = new ResponseDTO<List<BlogDTO>>();
             try
             {
-                List<BlogDTO> blogs = _blog.Get(null, user);
+                List<BlogDTO> blogs = await _blog.Get(null, user);
                 res.Success = true;
                 res.Data = blogs;
                 return Ok(res);
@@ -78,12 +78,12 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<ResponseDTO<BlogDTO>> Get(int id, int authorid, int screenId)
+        public async Task<ActionResult<ResponseDTO<BlogDTO>>> Get(int id, int authorid, int screenId)
         {
             ResponseDTO<BlogDTO> res = new ResponseDTO<BlogDTO>();
             try
             {
-                BlogDTO blog = _blog.Get(id);
+                BlogDTO blog =  await _blog.Get(id);
 
                 if (blog == null)
                 {
@@ -109,12 +109,12 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<ResponseDTO<Blog>> Edit(BlogDTO blog, int screenId)
+        public async Task<ActionResult<ResponseDTO<Blog>>> Edit(BlogDTO blog, int screenId)
         {
             ResponseDTO<Blog> res = new ResponseDTO<Blog>();
             try
             {
-                Blog? b = _blog.Edit(blog);
+                Blog? b = await _blog.Edit(blog);
 
                 if (b == null)
                 {
@@ -140,12 +140,12 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<ResponseDTO<NoContent>> Delete(int id, int screenId)
+        public async Task<ActionResult<ResponseDTO<NoContent>>> Delete(int id, int screenId)
         {
             ResponseDTO<NoContent> res = new ResponseDTO<NoContent>();
             try
             {
-                Blog? b = _blog.Delete(id);
+                Blog? b = await _blog.Delete(id);
 
                 if (b == null)
                 {
@@ -166,12 +166,12 @@ namespace Backend.Controllers
         }
 
         [HttpGet("{authorId:int}")]
-        public ActionResult<ResponseDTO<List<Blog>>> GetByAuthor(int screenId, int? authorId)
+        public async Task<ActionResult<ResponseDTO<List<Blog>>>> GetByAuthor(int screenId, int? authorId)
         {
             ResponseDTO<List<BlogDTO>> res = new ResponseDTO<List<BlogDTO>>();
             try
             {
-                List<BlogDTO> blogs = _blog.Get(authorId, false);
+                List<BlogDTO> blogs = await _blog.Get(authorId, false);
                 res.Success = true;
                 res.Data = blogs;
                 return Ok(res);
@@ -190,12 +190,12 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<ResponseDTO<Blog>> Approve(int blogId, int screenId)
+        public async Task<ActionResult<ResponseDTO<Blog>>> Approve(int blogId, int screenId)
         {
             ResponseDTO<Blog> res = new ResponseDTO<Blog>();
             try
             {
-                Blog? b = _blog.Approve(blogId);
+                Blog? b = await _blog.Approve(blogId);
 
                 if (b == null)
                 {

@@ -6,10 +6,10 @@ namespace BusinessLogic.Interfaces
     public interface IUserRepo
     {
 
-        public User? Delete(int userId);
+        public Task<User>? Delete(int userId);
 
-        public List<UserRespDTO> Get();
+        public Task<List<UserRespDTO>> Get();
 
-        public void Subscribe(int userId, int subscribe);
+        public Task Subscribe(int userId, int subscribe);
     }
 }

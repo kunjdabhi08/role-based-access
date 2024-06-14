@@ -35,9 +35,9 @@ export class NewBlogComponent {
   id: number;
 
   constructor(
-    private router: Router, 
-    private blogService: BlogService,  
-    private route: ActivatedRoute, 
+    private router: Router,
+    private blogService: BlogService,
+    private route: ActivatedRoute,
     private commonService: CommonService,
     private authService: AuthServiceService
   ) {
@@ -52,14 +52,49 @@ export class NewBlogComponent {
     this.patchData();
     this.blogForm = new FormGroup<BlogFormModel>({
       blogId: new FormControl(0),
-      title: new FormControl('', [Validators.required]),
-      content: new FormControl("", [Validators.required]),
+      title: new FormControl('', [Validators.required, Validators.pattern(/^(?=.*\S).+$/), Validators.maxLength(300)]),
+      content: new FormControl("", [Validators.required, Validators.pattern(/^(?=.*\S).+$/)]),
       authorId: new FormControl(0),
       isPremium: new FormControl(false, [Validators.required]),
     })
   }
 
-  private patchData = ():void => {
+  public handleBack = (): void => {
+    this.router.navigate(["/blog/blogs"]);
+  }
+
+  get f() {
+    return this.blogForm.controls;
+  }
+
+  public handleSubmit = (): void => {
+    this.blogForm.markAllAsTouched();
+    if (this.blogForm.valid) {
+      this.blogForm.value.content = JSON.stringify(this.blogForm.value.content);
+      this.blogForm.value.authorId = this.user.authorId;
+
+      if (!this.id) {
+
+        this.blogService.postBlog(this.blogForm.value, 1).subscribe({
+          next: () => {
+            this.commonService.openSnackBar("Blog Added");
+            this.router.navigate(["/blog/blogs"]);
+          }
+        })
+      } else {
+        this.blogService.editBlog(this.blogForm.value, 1).subscribe({
+          next: () => {
+
+            this.commonService.openSnackBar("Blog Edited");
+            this.router.navigate(["/blog/blogs"]);
+          }
+        })
+      }
+
+    }
+  }
+
+  private patchData = (): void => {
     if (this.id > 0) {
       this.blogService.getBlog(ScreenEnum.Blog, this.id).subscribe({
         next: (data) => {
@@ -71,44 +106,6 @@ export class NewBlogComponent {
           })
         }
       })
-    }
-  }
-
-  handleBack = ():void => {
-    this.router.navigate(["/blog/blogs"]);
-  }
-
-  get f() {
-    return this.blogForm.controls;
-  }
-
-  handleSubmit = ():void => {
-    this.blogForm.markAllAsTouched();
-    if (this.blogForm.valid) {
-      this.blogForm.value.content = JSON.stringify(this.blogForm.value.content);
-      this.blogForm.value.authorId = this.user.authorId;
-
-      if (!this.id) {
-
-        this.blogService.postBlog(this.blogForm.value, 1).subscribe({
-          next: () => {
-            this.router.navigate(["/blog/blogs"]);
-          },
-          error: (err) => {
-            this.commonService.openSnackBar(err.error.message);
-          }
-        })
-      } else {
-        this.blogService.editBlog(this.blogForm.value, 1).subscribe({
-          next: () => {
-            this.router.navigate(["/blog/blogs"]);
-          },
-          error: (err) => {
-            this.commonService.openSnackBar(err.error.message);
-          }
-        })
-      }
-
     }
   }
 

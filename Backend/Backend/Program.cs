@@ -22,7 +22,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDBContext>(option =>
 {
     option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+}, ServiceLifetime.Transient);
 
 builder.Services.AddAuthentication(opt =>
 {
@@ -31,7 +31,7 @@ builder.Services.AddAuthentication(opt =>
 })
 .AddJwtBearer(opt =>
 {
-    opt.RequireHttpsMetadata = false; // for development only
+    opt.RequireHttpsMetadata = false; 
     opt.SaveToken = true;
     opt.TokenValidationParameters = new TokenValidationParameters
     {

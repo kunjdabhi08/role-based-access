@@ -40,15 +40,7 @@ export class AuthServiceService {
     return false;
   }
 
-  public getPermission = (screenId: number): AccessModel => {
-    var permissions = JSON.parse(localStorage.getItem('permission'));
-    for (let i = 0; i < permissions.length; i++) {
-      if (permissions[i].screenId === screenId) {
-        return permissions[i];
-      }
-    }
-    return null;
-  }
+
 
   public autoLogin = (): void => {
     var token = sessionStorage.getItem('token');

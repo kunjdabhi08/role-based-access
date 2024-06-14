@@ -1,6 +1,6 @@
 <div class="d-flex container justify-content-center align-items-center min-vh-100">
-    <div class="container px-5">
-        <mat-card class="">
+    <div class="container px-5  ">
+        <mat-card class="login py-5">
             <mat-card-header class="d-flex justify-content-center">
                 <mat-card-title class="text-center fs-3">Login</mat-card-title>
             </mat-card-header>
@@ -11,12 +11,14 @@
                             <mat-form-field class="w-100">
                                 <mat-label class="text-secondary">Enter your email</mat-label>
                                 <input formControlName="email" placeholder="Email" matInput type="email">
-
                                 <mat-error *ngIf="loginForm.get('email')?.touched && f['email'].errors?.['required']">
                                     Email is required
                                 </mat-error>
                                 <mat-error *ngIf="loginForm.get('email')?.touched && f['email'].errors?.['email']">
                                     Enter valid email
+                                </mat-error>
+                                <mat-error *ngIf="loginForm.get('email')?.touched && f['email'].errors?.['pattern']">
+                                    Whitespaces are not allowed
                                 </mat-error>
                             </mat-form-field>
                         </div>
@@ -24,12 +26,10 @@
                             <mat-form-field class="w-100">
                                 <mat-label class="text-secondary">Enter your password</mat-label>
                                 <input formControlName="password" matInput [type]="hide ? 'password' : 'text'">
-
                                 <button mat-icon-button matSuffix (click)="clickEvent($event)"
                                     [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
                                     <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                                 </button>
-
                                 <mat-error class="text-start"
                                     *ngIf="loginForm.get('password')?.touched && f['password'].errors?.['required']">
                                     Password is required
@@ -43,7 +43,7 @@
                     </div>
                 </form>
             </mat-card-content>
-            <mat-card-actions class="d-flex flex-column gap-3 justify-content-center my-3">
+            <mat-card-actions class="d-flex flex-column gap-3 justify-content-center">
                 <a routerLink="/register">Don't have account?</a>
             </mat-card-actions>
         </mat-card>

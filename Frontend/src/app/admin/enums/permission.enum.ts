@@ -8,3 +8,10 @@ export enum PermissionEnum  {
     Delete,
     Read
 }
+
+export enum PermissionStringEnum {
+    Create = "create",
+    Edit = "edit",
+    Delete = "delete",
+    Read = "view"
+}

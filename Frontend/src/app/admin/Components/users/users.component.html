@@ -45,7 +45,7 @@
         <ng-container matColumnDef="actions">
             <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef>Actions</th>
             <td class=" gap-2" mat-cell *matCellDef="let e">
-                @if(e.roleId !== 1){
+                @if(e.roleId !== 1 && user.id !== e.id){
                 <button mat-mini-fab color="warn" (click)="handleDelete(e.id)">
                     <mat-icon>delete</mat-icon></button>
                 }

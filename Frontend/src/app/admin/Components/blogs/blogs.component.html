@@ -16,7 +16,7 @@
             <mat-label>Search by Title, Author</mat-label>
             <input matInput placeholder="Search" (keyup)="searchRecord($event)">
         </mat-form-field>
-        <mat-checkbox (change)="handleFilterChange($event.checked)">
+        <mat-checkbox (change)="handleFilterChange($event.checked)" [checked]="isFilterChecked">
             Unapproved Blogs
         </mat-checkbox>
         <table mat-table [dataSource]="dataSource" matSort>
@@ -62,7 +62,7 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons
+        <mat-paginator [pageSizeOptions]="[10, 15, 25, 100]" showFirstLastButtons
             aria-label="Select page of users"></mat-paginator>
 
 

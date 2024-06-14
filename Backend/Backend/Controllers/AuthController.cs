@@ -3,8 +3,6 @@ using DataAccess.Models;
 using DataAccess.Models.DTO;
 using BusinessLogic.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System.Diagnostics;
 
 namespace Backend.Controllers
 {
@@ -24,11 +22,11 @@ namespace Backend.Controllers
 
         }
 
-
+        
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<User>> Register(UserDTO user)
+        public async Task<ActionResult<ResponseDTO<User>>> Register(UserDTO user)
         {
             if (ModelState.IsValid)
             {
@@ -40,7 +38,7 @@ namespace Backend.Controllers
                         throw new Exception("Something Went Wrong");
                     }
 
-                    User u = _auth.Register(user);
+                    User u = await _auth.Register(user);
 
                     response.Success = true;
                     response.Data = u;
@@ -63,7 +61,7 @@ namespace Backend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<AuthResponseDTO> Login(string email, string password)
+        public async Task<ActionResult<AuthResponseDTO>> Login(string email, string password)
             {
             AuthResponseDTO res = new AuthResponseDTO();
             try
@@ -73,7 +71,7 @@ namespace Backend.Controllers
                     throw new Exception("Something went wrong");
                 }
 
-                UserRespDTO? u = _auth.Login(email, password);
+                UserRespDTO? u =await _auth.Login(email, password);
                 if (u == null)
                 {
                     res.Success = false;
@@ -83,8 +81,6 @@ namespace Backend.Controllers
                 }
 
                 string token = _jwt.GenerateToken(email, u.RoleName, (int)u.RoleId);
-                List<AccessDTO> access = _access.Get((int)u.RoleId);
-                res.Permissions = access;
                 res.Success = true;
                 res.Data = u;
                 res.Token = token;

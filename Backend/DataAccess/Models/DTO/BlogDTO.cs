@@ -12,6 +12,7 @@ namespace DataAccess.Models.DTO
 
         public int? BlogId { get; set; }
 
+        [MaxLength(300)]
         [Required(ErrorMessage = "Blog Name is required")]
         public string Title { get; set; }
 

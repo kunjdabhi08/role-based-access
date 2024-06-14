@@ -3,6 +3,7 @@ using DataAccess.Models.DTO;
 using BusinessLogic.Interfaces;
 using DataAccess.Data;
 using BusinessLogic.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Repositories
 {
@@ -13,10 +14,10 @@ namespace BusinessLogic.Repositories
         {
             _dbContext = dbContext;
         }
-        public User Register(UserDTO user)
+        public async Task<User> Register(UserDTO user)
         {
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
-            User? Exists = _dbContext.Users.FirstOrDefault(x => x.Email == user.Email && x.IsDeleted == false);
+            User? Exists = await _dbContext.Users.FirstOrDefaultAsync(userFromDb => userFromDb.Email == user.Email && userFromDb.IsDeleted == false);
             if (Exists != null) {
                 throw new Exception("User Already Exists with this email");
             }
@@ -31,8 +32,8 @@ namespace BusinessLogic.Repositories
             };
 
 
-            _dbContext.Users.Add(u);
-            _dbContext.SaveChanges();
+            await _dbContext.Users.AddAsync(u);
+            await _dbContext.SaveChangesAsync();
 
             if (u.RoleId == (int)RoleTypeEnum.Reader)
             {
@@ -43,8 +44,8 @@ namespace BusinessLogic.Repositories
                     Email = user.Email,
                     UserId = u.UserId
                 };
-                _dbContext.Readers.Add(r);
-                _dbContext.SaveChanges();
+                await _dbContext.Readers.AddAsync(r);
+                await _dbContext.SaveChangesAsync();
             }
 
             if(u.RoleId == (int)RoleTypeEnum.Author)
@@ -56,31 +57,31 @@ namespace BusinessLogic.Repositories
                     UserId = u.UserId,
                     TotalBlogs = 0,
                 };
-                _dbContext.Authors.Add(author);
-                _dbContext.SaveChanges();
+                await _dbContext.Authors.AddAsync(author);
+                await _dbContext.SaveChangesAsync();
             }
 
             return u;
         }
 
-        public UserRespDTO? Login(string email, string password)
+        public async Task<UserRespDTO>? Login(string email, string password)
         {
-            User? u = _dbContext.Users.FirstOrDefault(x => x.Email == email && x.IsDeleted == false);
+            User? loginUser = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == email && x.IsDeleted == false);
             UserRespDTO user = new UserRespDTO();
-            if (u != null)
+            if (loginUser != null)
             {
-                bool loggedIn = BCrypt.Net.BCrypt.Verify(password, u.Password);
+                bool loggedIn = BCrypt.Net.BCrypt.Verify(password, loginUser.Password);
                 if (loggedIn)
                 {
-                    user.Id = u.UserId;
+                    user.Id = loginUser.UserId;
                     user.Email = email;
-                    user.Name = u.Name;
-                    user.RoleId = u.RoleId;
-                    user.RoleName = _dbContext.Roles.FirstOrDefault(x => x.RoleId == u.RoleId)?.RoleName;
+                    user.Name = loginUser.Name;
+                    user.RoleId = loginUser.RoleId;
+                    user.RoleName =  _dbContext.Roles.FirstOrDefault(role => role.RoleId == loginUser.RoleId)?.RoleName;
 
-                    if(u.RoleId == 3)
+                    if(loginUser.RoleId == 3)
                     {
-                        user.AuthorId = _dbContext.Authors.FirstOrDefault(x=> x.UserId == u.UserId)?.AuthorId;
+                        user.AuthorId =  _dbContext.Authors.FirstOrDefault(author=> author.UserId == loginUser.UserId)?.AuthorId;
                     }
 
 

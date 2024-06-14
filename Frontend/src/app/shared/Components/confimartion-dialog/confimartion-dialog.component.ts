@@ -9,15 +9,23 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
   templateUrl: './confimartion-dialog.component.html',
   styleUrl: './confimartion-dialog.component.css'
 })
+
 export class ConfimartionDialogComponent {
+
   message: string = "Are you sure want to delete?"
-  constructor(public dialogRef: MatDialogRef<ConfimartionDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { 
-    if(data.message){ 
+  isSubscribe: boolean = false;
+
+  constructor(
+    public dialogRef: MatDialogRef<ConfimartionDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    if (data.message) {
       this.message = data.message;
+      this.isSubscribe = true;
     }
   }
 
-  public onConfirm = () => {
+  public onConfirm = (): void => {
     this.dialogRef.close(true);
   }
 }

@@ -14,7 +14,6 @@ import { User } from '../../Models/user.model';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { roleTypeEnum } from '../../../shared/enums/role.enum';
 import { CommonService } from '../../../shared/Services/common.service';
-import * as CryptoJS from 'crypto-js';
 
 @Component({
   selector: 'app-login',
@@ -34,18 +33,24 @@ import * as CryptoJS from 'crypto-js';
 })
 
 export class LoginComponent implements OnInit {
+
   public hide = true;
   public permissionError!: string;
   public loginForm!: FormGroup;
  
-  constructor(private authService: AuthServiceService, private router: Router, private route: ActivatedRoute,  private commonService: CommonService) {
+  constructor(
+    private authService: AuthServiceService, 
+    private router: Router, 
+    private route: ActivatedRoute, 
+    private commonService: CommonService
+  ) {
     authService.autoLogin();
   }
 
 
   ngOnInit(): void {
     this.loginForm = new FormGroup<LoginFormModel>({
-      email: new FormControl(null, [Validators.required, Validators.email]),
+      email: new FormControl(null, [Validators.required, Validators.email, Validators.pattern(/^(?=.*\S).+$/)]),
       password: new FormControl(null, [Validators.required])
     })
   }
@@ -72,7 +77,6 @@ export class LoginComponent implements OnInit {
             this.authService.isAuth.next(true);
             sessionStorage.setItem('token', JSON.stringify(data.token));
             sessionStorage.setItem('user', this.commonService.encrypt(JSON.stringify(data.data)));
-            localStorage.setItem('permission', JSON.stringify(data.permissions));
             if (data.data.roleId === roleTypeEnum.Reader || data.data.roleId === roleTypeEnum.SubscribedReader || data.data.roleId === roleTypeEnum.Author) {
               this.router.navigate(["/blog/blogs"])
             }
@@ -82,10 +86,8 @@ export class LoginComponent implements OnInit {
             else {
               this.router.navigate(["admin/blogs"])
             }
+            this.commonService.openSnackBar("LoggedIn Succesfully");
           }
-        },
-        error: (err) => {
-          this.commonService.openSnackBar(err.error.message);
         }
       })
     }

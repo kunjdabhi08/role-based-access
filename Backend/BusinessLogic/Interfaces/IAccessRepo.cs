@@ -7,11 +7,8 @@ namespace BusinessLogic.Interfaces
     {
         public Access? Get(int roleid, int screenid);
 
-        public Access? Edit(int roleid, int screenid, bool[] editedAccess);
+        public Task<List<AccessDTO>>? Edit(List<AccessDTO> accesses);
 
-        public List<AccessDTO> Get();
-
-        public List<AccessDTO> Get(int roleId);
-
+        public Task<List<AccessDTO>> Get(int roleId);
     }
 }

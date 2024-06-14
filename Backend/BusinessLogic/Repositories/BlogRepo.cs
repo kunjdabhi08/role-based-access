@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccess.Models;
+﻿using DataAccess.Models;
 using BusinessLogic.Interfaces;
 using DataAccess.Data;
 using DataAccess.Models.DTO;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Repositories
 {
     public class BlogRepo : IBlogRepo
     {
         private readonly AppDBContext _dbContext;
-        public BlogRepo(AppDBContext dBContext) { 
+        public BlogRepo(AppDBContext dBContext)
+        {
             _dbContext = dBContext;
         }
 
-        public Blog Create(BlogDTO blog)
+        public async Task<Blog> Create(BlogDTO blog)
         {
             Blog b = new Blog
             {
@@ -30,55 +27,59 @@ namespace BusinessLogic.Repositories
                 IsPremium = blog.isPremium,
             };
 
-            _dbContext.Blogs.Add(b);
-            _dbContext.SaveChanges();
+            await _dbContext.Blogs.AddAsync(b);
+            await _dbContext.SaveChangesAsync();
 
             return b;
         }
 
-        public List<BlogDTO> Get(int? authorId, bool user)
+        public async Task<List<BlogDTO>> Get(int? authorId, bool user)
         {
-            List<BlogDTO> blogs = _dbContext.Blogs.Where(x=>x.IsDeleted == false).Select(x => new BlogDTO { 
-                Title = x.Title,
-                Content = x.Content,
-                IsApproved = x.IsApproved,
-                isPremium = x.IsPremium,    
-                AuthorName = x.Author.Name,
-                AuthorId = x.AuthorId ,
-                BlogId = x.BlogId,
-                CreatedAt = x.CreatedDate.Date,
-            }).ToList();
-
-            if(authorId != null)
-            {
-                int id = _dbContext.Authors.FirstOrDefault(author => author.UserId == (int)authorId).AuthorId;
-                return blogs.Where(blog => blog.AuthorId == id).ToList();
-            }
+            IQueryable<Blog> query = _dbContext.Blogs.Where(blog => !blog.IsDeleted);
 
             if (user)
             {
-                return blogs.Where(blog => blog.IsApproved == true).ToList();
+                query = query.Where(blog => blog.IsApproved);
             }
+            else if (authorId.HasValue)
+            {
+                int authorDbId = (await _dbContext.Authors.Where(author => author.UserId == authorId.Value).Select(author => author.AuthorId).FirstOrDefaultAsync());
+
+                query = query.Where(blog => blog.AuthorId == authorDbId);
+            }
+
+            var blogs = await query.Select(blog => new BlogDTO
+            {
+                Title = blog.Title,
+                Content = blog.Content,
+                IsApproved = blog.IsApproved,
+                isPremium = blog.IsPremium,
+                AuthorName = blog.Author.Name,
+                AuthorId = blog.AuthorId,
+                BlogId = blog.BlogId,
+                CreatedAt = blog.CreatedDate.Date,
+            }).ToListAsync();
 
             return blogs;
         }
 
-        public BlogDTO? Get(int id)
-        {
-            Blog? x = _dbContext.Blogs.FirstOrDefault(y=> y.BlogId == id && y.IsDeleted == false);
 
-            if(x != null)
+        public async Task<BlogDTO?> Get(int id)
+        {
+            Blog? blog = await _dbContext.Blogs.FirstOrDefaultAsync(blog => blog.BlogId == id && blog.IsDeleted == false);
+
+            if (blog != null)
             {
                 BlogDTO b = new BlogDTO
                 {
-                    BlogId = x.BlogId,
-                    Title = x.Title,
-                    Content = x.Content,
-                    IsApproved = x.IsApproved,
-                    isPremium = x.IsPremium,
-                    AuthorName = _dbContext.Authors.FirstOrDefault(a=>a.AuthorId == x.AuthorId).Name,
-                    AuthorId = x.AuthorId,
-                    CreatedAt = x.CreatedDate.Date,
+                    BlogId = blog.BlogId,
+                    Title = blog.Title,
+                    Content = blog.Content,
+                    IsApproved = blog.IsApproved,
+                    isPremium = blog.IsPremium,
+                    AuthorName = (await _dbContext.Authors.FirstOrDefaultAsync(author => author.AuthorId == blog.AuthorId)).Name,
+                    AuthorId = blog.AuthorId,
+                    CreatedAt = blog.CreatedDate.Date,
                 };
 
                 return b;
@@ -87,51 +88,49 @@ namespace BusinessLogic.Repositories
             return null;
         }
 
-        public Blog? Edit(BlogDTO blog)
+        public async Task<Blog?> Edit(BlogDTO blog)
         {
-            Blog? b = _dbContext.Blogs.FirstOrDefault(x=>x.BlogId == blog.BlogId && x.IsDeleted == false);
+            Blog? blogToEdit = await _dbContext.Blogs.FirstOrDefaultAsync(blogInDb => blogInDb.BlogId == blog.BlogId && blogInDb.IsDeleted == false);
 
-            if(b != null)
+            if (blogToEdit != null)
             {
-                b.Title = blog.Title;
-                b.Content = blog.Content;
-                b.IsPremium = blog.isPremium;
+                blogToEdit.Title = blog.Title;
+                blogToEdit.Content = blog.Content;
+                blogToEdit.IsPremium = blog.isPremium;
 
-                _dbContext.Blogs.Update(b);
-                _dbContext.SaveChanges();   
+                _dbContext.Blogs.Update(blogToEdit);
+                await _dbContext.SaveChangesAsync();
             }
 
-            return b;
-
+            return blogToEdit;
         }
 
-        public Blog? Delete(int id)
+
+        public async Task<Blog?> Delete(int id)
         {
-            Blog blog = _dbContext.Blogs.FirstOrDefault(x=>x.BlogId==id && x.IsDeleted == false);
-            if(blog != null)
+            Blog? blog = await _dbContext.Blogs.FirstOrDefaultAsync(blog => blog.BlogId == id && blog.IsDeleted == false);
+            if (blog != null)
             {
                 blog.IsDeleted = true;
                 _dbContext.Blogs.Update(blog);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
             return blog;
         }
 
-
-        public Blog? Approve(int blogId)
+        public async Task<Blog?> Approve(int blogId)
         {
-            Blog? b = _dbContext.Blogs.FirstOrDefault(x => x.BlogId == blogId && x.IsDeleted == false);
+            Blog? blog = await _dbContext.Blogs.FirstOrDefaultAsync(blog => blog.BlogId == blogId && blog.IsDeleted == false);
 
-            if (b != null)
+            if (blog != null)
             {
-               b.IsApproved = true;
+                blog.IsApproved = true;
 
-                _dbContext.Blogs.Update(b);
-                _dbContext.SaveChanges();
+                _dbContext.Blogs.Update(blog);
+                await _dbContext.SaveChangesAsync();
             }
 
-            return b;
-
+            return blog;
         }
 
 

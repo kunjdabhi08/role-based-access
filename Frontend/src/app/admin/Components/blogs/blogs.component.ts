@@ -1,27 +1,22 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Router, RouterLink } from '@angular/router';
 import { roleTypeEnum } from '../../../shared/enums/role.enum';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { BlogService } from '../../../blog/Services/blog.service';
 import { BlogModel } from '../../../blog/Models/blog.model';
 import { AuthServiceService } from '../../../auth/Services/Auth/auth-service.service';
-import { AccessModel } from '../../Models/access.model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSort, MatSortHeader, MatSortModule } from '@angular/material/sort';
 import { DatePipe } from '@angular/common';
 import { MatFormField } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ScreenEnum } from '../../../shared/enums/screen.enum';
-import { PermissionEnum } from '../../enums/permission.enum';
 import { CommonService } from '../../../shared/Services/common.service';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfimartionDialogComponent } from '../../../shared/Components/confimartion-dialog/confimartion-dialog.component';
-import { BlobOptions } from 'buffer';
+import { PermissionModel } from '../../Models/permission.model';
+import { User } from '../../../auth/Models/user.model';
 
 @Component({
   selector: 'app-blogs',
@@ -44,38 +39,35 @@ import { BlobOptions } from 'buffer';
   styleUrl: './blogs.component.css'
 })
 export class BlogsComponent implements OnInit, AfterViewInit {
-  isFilterChecked: boolean;
 
+  isFilterChecked: boolean = false;
   displayedColumns: string[] = ['index', 'title', 'author', 'date', 'actions'];
-
   roleEnum = roleTypeEnum;
-
   blogs: BlogModel[];
-
-  permission: AccessModel;
-
+  permission: PermissionModel;
   dataSource = new MatTableDataSource<BlogModel>();
+  user: User;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
 
   constructor(
-    private blogService: BlogService, 
-    private router: Router, 
-    private authService: AuthServiceService, 
-    private dialog: MatDialog, 
+    private blogService: BlogService,
+    private router: Router,
+    private authService: AuthServiceService,
     private commonService: CommonService
   ) {
-    this.permission = this.authService.getPermission(ScreenEnum.Admin);
   }
 
- 
+
   ngOnInit(): void {
-    if (!this.permission.accesses[PermissionEnum.Read]) {
-      this.router.navigate(["/forbidden"])
-    }
+    this.user = this.authService.getUser();
+    this.fetchPermsisionForScreen(this.user.roleId, ScreenEnum.Admin);
     this.fetchBlogs();
+
+   
+
   }
 
   ngAfterViewInit(): void {
@@ -83,58 +75,42 @@ export class BlogsComponent implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
   }
 
-  private fetchBlogs = (): void => {
-    this.blogService.getBlogs(ScreenEnum.Admin, false).subscribe({
-      next: (data: any) => {
-        if (data.statusCode && data.statusCode === 401) {
-          sessionStorage.clear();
-          this.router.navigate([""]);
-        }
-        this.blogs = data.data;
-        this.dataSource.data = data.data;
-
-      },
-      error: (err) => {
-        this.commonService.openSnackBar(err.error.message);
-      }
-    })
-
-  }
 
   public handleApprove = (blogId: number): void => {
-    if (!this.permission.accesses[PermissionEnum.Edit]) {
+    if (!this.permission.edit) {
       this.commonService.openForbiddenDialog();
       return;
     }
-    if (confirm("Are you sure?")) {
-      this.blogService.approveBlog(blogId, ScreenEnum.Admin).subscribe({
-        next: () => {
-          this.commonService.openSnackBar("Blog Approved");
-          this.fetchBlogs();
-        },
-        error: (err) => {
-          this.commonService.openSnackBar(err.error.message);
-        }
-      })
-    }
+
+    const confirm = this.commonService.takeConfirmation("Are you sure?");
+    confirm.beforeClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        this.blogService.approveBlog(blogId, ScreenEnum.Admin).subscribe({
+          next: () => {
+            this.commonService.openSnackBar("Blog Approved");
+            this.fetchBlogs();
+            if(this.isFilterChecked){
+              this.handleFilterChange(this.isFilterChecked)
+            }
+          }
+        })
+      }
+    })
   }
 
   public handleDelete = (blogid: number): void => {
-    if (!this.permission.accesses[PermissionEnum.Delete]) {
+    if (!this.permission.delete) {
       this.commonService.openForbiddenDialog();
       return;
     }
-    
     const confirm = this.commonService.takeConfirmation();
     confirm.beforeClosed().subscribe((confirm: boolean) => {
       if (confirm) {
-        this.blogService.deleleBlog(blogid, 5).subscribe({
+        this.blogService.deleleBlog(blogid, ScreenEnum.Admin).subscribe({
           next: (data) => {
             if (data.success)
               this.fetchBlogs();
-          },
-          error: (err) => {
-            this.commonService.openSnackBar(err.error.message);
+            this.commonService.openSnackBar("Blog deleted Successfully");
           }
         })
       }
@@ -143,12 +119,11 @@ export class BlogsComponent implements OnInit, AfterViewInit {
   }
 
   public handleFilterChange = (checked: boolean): void => {
+    this.isFilterChecked = checked
     if (checked) {
-      this.isFilterChecked = checked
       this.blogs = this.dataSource.data.filter((blog) => blog.isApproved === false);
       this.dataSource.data = this.blogs;
     } else {
-      this.isFilterChecked = checked
       this.fetchBlogs();
     }
   }
@@ -161,6 +136,32 @@ export class BlogsComponent implements OnInit, AfterViewInit {
     else {
       this.dataSource.data = this.blogs
     }
+  }
+
+  private fetchBlogs = (): void => {
+    this.blogService.getBlogs(ScreenEnum.Admin, false).subscribe({
+      next: (data: any) => {
+        if (data.statusCode && data.statusCode === 401) {
+          sessionStorage.clear();
+          this.router.navigate([""]);
+        }
+        this.blogs = data.data;
+        this.dataSource.data = data.data;
+
+      }
+    })
+
+  }
+
+  private fetchPermsisionForScreen = (roleId: number, screenId: number) => {
+    this.commonService.fetchPermissionForScreen(roleId, screenId).subscribe({
+      next: (data) => {
+        this.permission = data.data;
+        if (data.success && !data.data.view) {
+          this.router.navigate(["/forbidden"])
+        }
+      }
+    })
   }
 
 

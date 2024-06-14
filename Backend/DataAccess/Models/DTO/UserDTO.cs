@@ -4,10 +4,11 @@ namespace DataAccess.Models.DTO
 {
     public class UserDTO
     {
-
+        [MaxLength(30)]
         [Required(ErrorMessage = "Name is Required")]
         public string? Name { get; set; }
 
+        [MaxLength(255)]
         [Required(ErrorMessage = "Email is Required")]
         public string? Email { get; set; }
 
@@ -20,7 +21,5 @@ namespace DataAccess.Models.DTO
         public string? ConfirmPassword { get; set; }
 
         public int? roleId { get; set; }
-
-
     }
 }

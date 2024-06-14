@@ -1,7 +1,6 @@
 ﻿using BusinessLogic.Interfaces;
 using DataAccess.Models;
 using DataAccess.Models.DTO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers
@@ -19,12 +18,12 @@ namespace Backend.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<ResponseDTO<List<Role>>> Get()
+        public async Task<ActionResult<ResponseDTO<List<Role>>>> Get()
         {
             ResponseDTO<List<Role>> res = new ResponseDTO<List<Role>>();
             try
             {
-                List<Role> roles = _role.Get();
+                List<Role> roles = await _role.Get();
                 res.Success = true;
                 res.Data = roles;
 

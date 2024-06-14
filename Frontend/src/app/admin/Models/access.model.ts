@@ -8,4 +8,8 @@ export interface AccessModel {
     roleName: string;
     screenName: string;
     accessId: number;
+    create: boolean;
+    edit: boolean;
+    view: boolean;
+    delete: boolean;
 }

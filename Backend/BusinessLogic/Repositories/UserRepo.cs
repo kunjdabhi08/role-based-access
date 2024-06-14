@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccess.Models;
+﻿using DataAccess.Models;
 using DataAccess.Models.DTO;
 using BusinessLogic.Interfaces;
 using DataAccess.Data;
-using DataAccess.Models.DTO;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Repositories
 {
@@ -20,52 +15,57 @@ namespace BusinessLogic.Repositories
         }
 
 
-        public User? Delete(int userId)
+        public async Task<User?> Delete(int userId)
         {
-            User user = _dbContext.Users.FirstOrDefault(x => x.UserId == userId && x.IsDeleted == false);
+            User? user = await _dbContext.Users.FirstOrDefaultAsync(user => user.UserId == userId && !user.IsDeleted);
 
             if (user != null)
             {
                 user.IsDeleted = true;
                 _dbContext.Users.Update(user);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
-                    
 
             return user;
         }
 
-        public List<UserRespDTO> Get()
+
+        public async Task<List<UserRespDTO>> Get()
         {
-            List<UserRespDTO> users = _dbContext.Users.Where(x=>x.IsDeleted == false).Select(x => new UserRespDTO
-            {
-                Id = x.UserId,
-                Name = x.Name,
-                Email = x.Email,
-                RoleId = x.RoleId,
-                RoleName = x.Role.RoleName,
-                IsSubscribed = _dbContext.Readers.FirstOrDefault(y => y.UserId == x.UserId).IsSubscribed
-            }).ToList();
+            List<UserRespDTO> users = await _dbContext.Users
+                .Where(x => !x.IsDeleted)
+                .Select(x => new UserRespDTO
+                {
+                    Id = x.UserId,
+                    Name = x.Name,
+                    Email = x.Email,
+                    RoleId = x.RoleId,
+                    RoleName = x.Role.RoleName,
+                    IsSubscribed = _dbContext.Readers.FirstOrDefault(reader => reader.UserId == reader.UserId).IsSubscribed
+                })
+                .ToListAsync();
 
             return users;
         }
 
 
-        public void Subscribe(int userId, int subscribe)
+
+        public async Task Subscribe(int userId, int subscribe)
         {
-            User user = _dbContext.Users.FirstOrDefault(x => x.UserId == userId && x.IsDeleted == false);
+            User? user = await _dbContext.Users.FirstOrDefaultAsync(user => user.UserId == userId && !user.IsDeleted);
             if (user != null)
             {
-                user.RoleId = subscribe == 1 ?  4 : 5;
+                user.RoleId = subscribe == 1 ? 4 : 5;
                 _dbContext.Users.Update(user);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
             }
-            Reader r = _dbContext.Readers.FirstOrDefault(x => x.UserId == userId);
-            if(r != null)
+
+            Reader? reader = await _dbContext.Readers.FirstOrDefaultAsync(reader => reader.UserId == userId);
+            if (reader != null)
             {
-                r.IsSubscribed = subscribe == 1 ? true : false;
-                _dbContext.Readers.Update(r);
-                _dbContext.SaveChanges();
+                reader.IsSubscribed = subscribe == 1;
+                _dbContext.Readers.Update(reader);
+                await _dbContext.SaveChangesAsync();
             }
         }
     }

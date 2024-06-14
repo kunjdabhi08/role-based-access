@@ -4,6 +4,6 @@ namespace BusinessLogic.Interfaces
 {
     public interface IRoleRepo
     {
-        public List<Role> Get();
+        public Task<List<Role>> Get();
     }
 }

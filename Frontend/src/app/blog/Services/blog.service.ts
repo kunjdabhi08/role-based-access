@@ -8,10 +8,11 @@ import { BlogModel } from '../Models/blog.model';
   providedIn: 'root'
 })
 export class BlogService {
+  
+  private apiUrl = "https://localhost:7270/api/blogs"
 
   constructor(private http: HttpClient) { }
 
-  private apiUrl = "https://localhost:7270/api/blogs"
 
   public getBlogs = (screenId: number, isUser: boolean):Observable<ResponseModel<BlogModel[]>> => {
     return this.http.get<ResponseModel<BlogModel[]>>(this.apiUrl + '/Get'+ "?screenId=" + screenId + `&user=${isUser}`)

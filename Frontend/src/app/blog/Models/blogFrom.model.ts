@@ -1,7 +1,5 @@
 import { FormControl } from "@angular/forms"
 
-
-
 export type BlogFormModel = {
     blogId?:  FormControl<number>;
     title: FormControl<string>,

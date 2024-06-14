@@ -12,6 +12,7 @@ import { MatDialogModule } from '@angular/material/dialog';
   templateUrl: './forbidden-dialog.component.html',
   styleUrl: './forbidden-dialog.component.css'
 })
+
 export class ForbiddenDialogComponent {
   
 }

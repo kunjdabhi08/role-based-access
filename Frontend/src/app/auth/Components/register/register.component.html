@@ -1,6 +1,6 @@
 <div class="d-flex container justify-content-center align-items-center min-vh-100">
     <div class="container">
-        <mat-card class="">
+        <mat-card class="register">
             <mat-card-header class="d-flex justify-content-center">
                 <mat-card-title class="text-center fs-3">Registration</mat-card-title>
             </mat-card-header>
@@ -14,6 +14,12 @@
                                 <mat-error *ngIf="signupForm.get('name')?.touched && f['name'].errors?.['required']">
                                     Name is required
                                 </mat-error>
+                                <mat-error *ngIf="signupForm.get('name')?.touched && f['name'].errors?.['maxlength']">
+                                    Name should be less than 30 Characters
+                                </mat-error>
+                                <mat-error *ngIf="signupForm.get('name')?.touched && f['name'].errors?.['pattern']">
+                                    Only whitespaces are not allowed
+                                </mat-error>
                             </mat-form-field>
                         </div>
                         <div class="w-50">
@@ -25,6 +31,9 @@
                                 </mat-error>
                                 <mat-error *ngIf="signupForm.get('email')?.touched && f['email'].errors?.['email']">
                                     Enter valid email
+                                </mat-error>
+                                <mat-error *ngIf="signupForm.get('email')?.touched && f['email'].errors?.['maxlength']">
+                                    Email should be less than 255 Characters
                                 </mat-error>
                             </mat-form-field>
                         </div>

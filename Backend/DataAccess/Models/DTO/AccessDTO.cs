@@ -15,13 +15,22 @@ namespace DataAccess.Models.DTO
         [Required(ErrorMessage = "ScreenId is required")]
         public int ScreenId { get; set; }
 
-        [MaxLength(4)]
-        public bool[] Accesses { get; set; }
-
         public string RoleName { get; set; }
 
         public string ScreenName { get; set; }  
 
         public int? AccessId { get; set; }
+
+        [Required(ErrorMessage = "Create Permission is required")]
+        public bool Create { get; set; }
+
+        [Required(ErrorMessage = "Edit Permission is required")]
+        public bool Edit { get; set; }
+
+        [Required(ErrorMessage = "Delete Permission is required")]
+        public bool Delete { get; set; }
+
+        [Required(ErrorMessage = "View Permission is required")]
+        public bool View { get; set; }
     }
 }

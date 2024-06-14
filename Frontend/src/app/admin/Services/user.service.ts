@@ -25,6 +25,6 @@ export class UserService {
   }
 
   public subscribeUser = (id: number, subscribe: number): Observable<ResponseModel<null>> => {
-    return this.http.post<ResponseModel<null>>(this.apiUrl + `/${id}?subscribe=${subscribe}`, null);
+    return this.http.post<ResponseModel<null>>(this.apiUrl + `/${id}?subscribe=${subscribe}&screenId=1`, null);
   }
 }
