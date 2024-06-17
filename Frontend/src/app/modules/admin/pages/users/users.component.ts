@@ -33,6 +33,7 @@ import { PermissionModel } from '../../models/permission.model';
 })
 
 export class UsersComponent {
+  
   dataSource = new MatTableDataSource<User>();
   permission: PermissionModel;
   users: User[];

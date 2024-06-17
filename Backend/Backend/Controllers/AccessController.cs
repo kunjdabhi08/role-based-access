@@ -20,7 +20,7 @@ namespace Backend.Controllers
         /// this action method is for editing access for every screen. it will take all the permission from database and will map the new permission form the access object provide in parameter
         /// </summary>
         /// <param name="access">access param is a list of screens along with its permission and screen id</param>
-        /// <returns></returns>
+        /// <returns>edited access</returns>
         [CustomAuth("Edit")]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -69,7 +69,7 @@ namespace Backend.Controllers
         /// this action method will return all the screen for perticular role
         /// </summary>
         /// <param name="roleid">roleid will container id of the selected role</param>
-        /// <returns></returns>
+        /// <returns>all the accesses in database with this role id</returns>
         [HttpGet("{roleid:int}")]
         [CustomAuth("View")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -100,7 +100,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="roleid">roleid is for id of the role for which we are getting the permission</param>
         /// <param name="screenid">screenid is id of the screen from which request has made</param>
-        /// <returns></returns>
+        /// <returns>get access for perticular screen and perticular role</returns>
         [HttpGet("{roleid:int}/{screenid:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

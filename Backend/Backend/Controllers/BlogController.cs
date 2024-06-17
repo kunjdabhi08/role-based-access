@@ -131,7 +131,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="blog">will contain fields title, content, id and isPremium</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
-        /// <returns></returns>
+        /// <returns>returns edited blog</returns>
         [CustomAuth("Edit")]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -169,7 +169,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="id">id of the blog which needs to be deleted</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
-        /// <returns></returns>
+        /// <returns>return void</returns>
         [CustomAuth("Delete")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -206,7 +206,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <param name="authorId">id of the author whose blogs to be fetched</param>
-        /// <returns></returns>
+        /// <returns>return list of blogs which is writtern by perticular author</returns>
         [HttpGet("{authorId:int}")]
         public async Task<ActionResult<ResponseDTO<List<Blog>>>> GetByAuthor(int screenId, int? authorId)
         {
@@ -233,7 +233,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="blogId">id of blog which is to be approved</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
-        /// <returns></returns>
+        /// <returns>returns approved blogs</returns>
         [CustomAuth("Edit")]
         [HttpPut("{blogId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

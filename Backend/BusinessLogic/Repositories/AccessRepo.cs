@@ -46,7 +46,8 @@ namespace BusinessLogic.Repositories
         
         public async Task<List<AccessDTO>> Get(int roleId)
         {
-            List<AccessDTO> access =  await _dbContext.Accesses.Where(acc => acc.RoleId == roleId).Select(acc => new AccessDTO {
+            List<AccessDTO> access =  await _dbContext.Accesses.Where(acc => acc.RoleId == roleId).Select(acc => new AccessDTO
+            {
                 AccessId = acc.AccessId,
                 RoleId = acc.RoleId,
                 ScreenId = acc.ScreenId,

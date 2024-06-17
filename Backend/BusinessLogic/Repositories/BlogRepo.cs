@@ -3,15 +3,19 @@ using BusinessLogic.Interfaces;
 using DataAccess.Data;
 using DataAccess.Models.DTO;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace BusinessLogic.Repositories
 {
     public class BlogRepo : IBlogRepo
     {
         private readonly AppDBContext _dbContext;
-        public BlogRepo(AppDBContext dBContext)
+        private readonly IMapper _mapper;
+        public BlogRepo(AppDBContext dBContext, IMapper mapper)
         {
             _dbContext = dBContext;
+            _mapper = mapper;
+
         }
 
         public async Task<Blog> Create(BlogDTO blog)
@@ -26,6 +30,7 @@ namespace BusinessLogic.Repositories
                 IsApproved = false,
                 IsPremium = blog.IsPremium,
             };
+
 
             await _dbContext.Blogs.AddAsync(b);
             await _dbContext.SaveChangesAsync();
@@ -70,6 +75,7 @@ namespace BusinessLogic.Repositories
 
             if (blog != null)
             {
+
                 BlogDTO b = new BlogDTO
                 {
                     BlogId = blog.BlogId,

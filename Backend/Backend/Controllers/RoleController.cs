@@ -19,7 +19,7 @@ namespace Backend.Controllers
         /// <summary>
         /// will return all the role with its id and name
         /// </summary>
-        /// <returns></returns>
+        /// <returns>return all the roles</returns>
         [HttpGet]
         [CustomAuth]
         [ProducesResponseType(StatusCodes.Status200OK)]

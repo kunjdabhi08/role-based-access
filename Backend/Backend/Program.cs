@@ -2,13 +2,8 @@
 using BusinessLogic.Interfaces;
 using BusinessLogic.Repositories;
 using DataAccess.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +20,7 @@ builder.Services.AddDbContext<AppDBContext>(option =>
     option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddSwaggerGen(opt =>
 {

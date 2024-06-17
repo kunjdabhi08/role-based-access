@@ -17,7 +17,7 @@ namespace DataAccess.Models.DTO
 
         public string? Token { get; set; }
 
-        public List<AccessDTO>? Permissions { get; set; }
+        public List<UserDTO>? Permissions { get; set; }
 
         
     }

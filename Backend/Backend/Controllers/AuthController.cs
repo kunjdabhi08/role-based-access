@@ -26,7 +26,7 @@ namespace Backend.Controllers
         /// this method will register user and add data to the database
         /// </summary>
         /// <param name="user">user will containe data of the user added by user</param>
-        /// <returns></returns>
+        /// <returns>registered user data</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -69,7 +69,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="email">email of the user</param>
         /// <param name="password">password of the user</param>
-        /// <returns></returns>
+        /// <returns>logged in user data with authentication token</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -23,7 +23,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="id">id of the user to be deleted</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
-        /// <returns></returns>
+        /// <returns>No content</returns>
         [CustomAuth("Delete")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -58,7 +58,7 @@ namespace Backend.Controllers
         /// <summary>
         /// this method will return all the users in database and is not  deleted.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>list of all the user present in database and is not deleted</returns>
         [HttpGet]
         [CustomAuth("View")]
         [ProducesResponseType(StatusCodes.Status200OK)]
