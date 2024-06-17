@@ -155,7 +155,7 @@ export class BlogsComponent implements OnInit, AfterViewInit {
       this.commonService.openForbiddenDialog(false);
       return;
     }
-    this.router.navigate([`/admin/blog/read/${id}`])
+    this.router.navigate([`/admin/blog/read/${id}`], { state: { isFromAdmin: true }})
   }
 
   private fetchBlogs = (): void => {

@@ -24,7 +24,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="blog">contains data of the blog like title, content and isMemberOnly or not.</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
-        /// <returns></returns>
+        /// <returns>created blogs</returns>
         [CustomAuth("Create")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -65,7 +65,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <param name="user">user is boolean field which will be true if user makes request</param>
-        /// <returns></returns>
+        /// <returns>list of all blogs</returns>
         [CustomAuth]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -93,13 +93,13 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="id">the id of blog which needs to fetched</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
-        /// <returns></returns>
+        /// <returns>a perticular blog corresponding to id</returns>
         [CustomAuth("View")]
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ResponseDTO<BlogDTO>>> Get(int id, int screenId)
+        public async Task<ActionResult<ResponseDTO<BlogDTO>>> Get(int id, int screenId) 
         {
             ResponseDTO<BlogDTO> res = new ResponseDTO<BlogDTO>();
             try

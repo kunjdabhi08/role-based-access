@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BlogService } from '../../services/blog.service';
 import { NavbarComponent } from '../../../../common/components/navbar/navbar.component';
 import { BlogModel } from '../../models/blog.model';
 import { MatButtonModule } from '@angular/material/button';
 import { ScreenEnum } from '../../../../common/enums/screen.enum';
+import { User } from '../../../auth/models/user.model';
+import { AuthServiceService } from '../../../auth/services/Auth/auth-service.service';
+import { roleTypeEnum } from '../../../../common/enums/role.enum';
 
 @Component({
   selector: 'app-blog',
@@ -14,15 +17,23 @@ import { ScreenEnum } from '../../../../common/enums/screen.enum';
   styleUrl: './blog.component.css'
 })
 export class BlogComponent implements OnInit {
+
   blog: BlogModel;
   id:number;
+  isFromAdmin: boolean;
+  user: User;
 
   constructor(
     private route: ActivatedRoute, 
-    private blogService: BlogService
-  ) {}
+    private blogService: BlogService,
+    private router: Router,
+    private authService: AuthServiceService
+  ) {
+    // this.isFromAdmin = this.router.getCurrentNavigation().extras.state['isFromAdmin'];
+  }
 
   ngOnInit(): void {
+    this.user = this.authService.getUser();
     this.id = Number(this.route.snapshot.paramMap.get('id'))
     this.fetchBlogById(this.id)
   }
@@ -31,13 +42,17 @@ export class BlogComponent implements OnInit {
     return JSON.parse(content);
   }
 
+  public handleBack = (): void => {
+    this.user.roleId === roleTypeEnum.Admin || roleTypeEnum.SuperAdmin ?  this.router.navigate(["/admin/blogs"]) :  this.router.navigate(["/blog/blogs"])
+  }
+
   private fetchBlogById = (id: number) => {
-    this.blogService.getBlog(ScreenEnum.Blog, id).subscribe({
+    let screenId = this.user.roleId === (roleTypeEnum.Admin || roleTypeEnum.SuperAdmin) ? ScreenEnum.Admin : ScreenEnum.Blog;
+    this.blogService.getBlog(screenId, id).subscribe({
       next: (data)=> {
         this.blog = data.data;
         this.blog.content = JSON.parse(this.blog.content);
       }
     })
   }
-
 }

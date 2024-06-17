@@ -7,7 +7,7 @@ import { NewBlogComponent } from './pages/new-blog/new-blog.component';
 
 const routes: Routes = [
   {path: 'blogs', component: BlogsComponent},
-  {path: 'read/:id', component: BlogComponent},
+  {path: 'read/:id', component: BlogComponent, data:{isFromAdmin: false}},
   {path: 'add' , component: NewBlogComponent,  pathMatch: 'full'},
   {path: 'edit/:id' , component: NewBlogComponent, pathMatch: 'full'},
 ];
