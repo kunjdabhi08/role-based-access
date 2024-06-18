@@ -42,9 +42,7 @@ export class NewBlogComponent {
     ['link', 'image'],
     ['text_color', 'background_color'],
     ['align_left', 'align_center', 'align_right', 'align_justify'],    
-    [ 'indent', 'outdent'],
-    ['superscript', 'subscript'],
-    ['undo', 'redo'],
+    ['superscript', 'subscript']  
   ];
 
   constructor(

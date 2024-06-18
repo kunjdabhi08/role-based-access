@@ -8,6 +8,8 @@ import { AccessService } from '../../modules/admin/services/access.service';
 import { PermissionModel } from '../../modules/admin/models/permission.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ResponseModel } from '../models/Response.model';
+import { Router } from '@angular/router';
+import { AuthServiceService } from '../../modules/auth/services/Auth/auth-service.service';
 
 @Injectable({
   providedIn: 'root'
@@ -60,5 +62,7 @@ export class CommonService {
     return this.accessService.getByScreen(roleId, screenId)
     
   }
+
+
 
 }

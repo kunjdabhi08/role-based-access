@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private authService: AuthServiceService,
     private router: Router,
-    private commonService: CommonService
+    private commonService: CommonService,
   ) {
     authService.autoLogin();
   }
@@ -50,6 +50,7 @@ export class LoginComponent implements OnInit {
 
 
   ngOnInit(): void {
+    // this.gptService.chat("hello");
     this.loginForm = new FormGroup<LoginFormModel>({
       email: new FormControl(null, [Validators.required, Validators.email, Validators.pattern(/^(?=.*\S).+$/)]),
       password: new FormControl(null, [Validators.required])

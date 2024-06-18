@@ -25,31 +25,21 @@ namespace BusinessLogic.Repositories
             {
                 throw new Exception("User Already Exists with this email");
             }
-            User u = new User
-            {
-                Name = user.Name,
-                Email = user.Email,
-                RoleId = user.RoleId == (int)RoleTypeEnum.Author ? (int)RoleTypeEnum.Author : (int)RoleTypeEnum.Reader,
-                Password = BCrypt.Net.BCrypt.HashPassword(user.Password, salt),
-                CreatedAt = DateTime.UtcNow,
-
-            };
-
-            //User u = _mapper.Map<User>(user);
-            //u.RoleId = user.RoleId == (int)RoleTypeEnum.Author ? (int)RoleTypeEnum.Author : (int)RoleTypeEnum.Reader;
-            //u.Password = BCrypt.Net.BCrypt.HashPassword(user.Password, salt);
-            //u.CreatedAt = DateTime.UtcNow;
-
+           
+            User u = _mapper.Map<User>(user);
+            u.RoleId = user.RoleId == (int)RoleTypeEnum.Author ? (int)RoleTypeEnum.Author : (int)RoleTypeEnum.Reader;
+            u.Password = BCrypt.Net.BCrypt.HashPassword(user.Password, salt);
+            u.CreatedAt = DateTime.UtcNow;
 
             await _dbContext.Users.AddAsync(u);
+            await _dbContext.SaveChangesAsync();
 
             if (u.RoleId == (int)RoleTypeEnum.Reader)
             {
-
                 Reader r = new Reader
                 {
-                    Name = user.Name,
-                    Email = user.Email,
+                    Name = u.Name,
+                    Email = u.Email,
                     UserId = u.UserId
                 };
                 await _dbContext.Readers.AddAsync(r);
@@ -60,15 +50,14 @@ namespace BusinessLogic.Repositories
             {
                 Author author = new Author
                 {
-                    Name = user.Name,
-                    Email = user.Email,
+                    Name = u.Name,
+                    Email = u.Email,
                     UserId = u.UserId,
                     TotalBlogs = 0,
                 };
                 await _dbContext.Authors.AddAsync(author);
                 await _dbContext.SaveChangesAsync();
             }
-
             return u;
         }
 
@@ -81,20 +70,14 @@ namespace BusinessLogic.Repositories
                 bool loggedIn = BCrypt.Net.BCrypt.Verify(password, loginUser.Password);
                 if (loggedIn)
                 {
-                    user.Id = loginUser.UserId;
-                    user.Email = email;
-                    user.Name = loginUser.Name;
-                    user.RoleId = loginUser.RoleId;
+                    user = _mapper.Map<UserRespDTO>(loginUser);
                     user.RoleName = _dbContext.Roles.FirstOrDefault(role => role.RoleId == loginUser.RoleId)?.RoleName;
 
                     if (loginUser.RoleId == (int)RoleTypeEnum.Author)
                     {
                         user.AuthorId = _dbContext.Authors.FirstOrDefault(author => author.UserId == loginUser.UserId)?.AuthorId;
                     }
-
-
                     return user;
-
                 }
                 throw new Exception("Credentials are not valid");
             }

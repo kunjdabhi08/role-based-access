@@ -1,10 +1,10 @@
 
 using BusinessLogic.Interfaces;
+using BusinessLogic.MapperProfile;
 using BusinessLogic.Repositories;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +14,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAutoMapper(typeof(MapperProfile));
 
 builder.Services.AddDbContext<AppDBContext>(option =>
 {
     option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddSwaggerGen(opt =>
 {

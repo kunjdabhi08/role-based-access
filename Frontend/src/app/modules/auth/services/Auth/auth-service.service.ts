@@ -57,4 +57,10 @@ export class AuthServiceService {
     return this.http.post<ResponseModel<User>>(this.apiUrl, model)
   }
 
+  public logout = ():void => {
+    sessionStorage.clear();
+    this.router.navigate([""]);
+    this.isAuth.next(false);
+  }
+
 } 

@@ -48,14 +48,14 @@
                 <th mat-header-cell class="mat-h2 fw-medium" *matHeaderCellDef>Actions</th>
                 <td class=" gap-2" mat-cell *matCellDef="let e">
                     @if(!e.isApproved){
-                    <button mat-mini-fab class="btn btn-danger ms-2" color="primary" (click)="handleApprove(e.blogId)">
+                    <button mat-mini-fab class=" ms-2" color="primary" (click)="handleApprove(e.blogId)">
                         <mat-icon>done</mat-icon>
                     </button>
                     }
-                    <button mat-mini-fab class="btn btn-danger ms-2" color="warn" (click)="handleDelete(e.blogId)">
+                    <button mat-mini-fab class=" ms-2" color="warn" (click)="handleDelete(e.blogId)">
                         <mat-icon>delete</mat-icon>
                     </button>
-                    <button mat-mini-fab class="btn btn-success ms-2" color="primary"
+                    <button mat-mini-fab class=" ms-2" color="primary"
                     (click)="handleRead(e.blogId)">
                     <mat-icon>open_in_new</mat-icon>
                 </button>

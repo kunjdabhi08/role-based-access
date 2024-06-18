@@ -23,20 +23,9 @@ namespace BusinessLogic.Repositories
 
         public async Task<Blog> Create(BlogDTO blog)
         {
-            Blog b = new Blog
-            {
-                Title = blog.Title,
-                Content = blog.Content,
-                AuthorId = blog.AuthorId,
-                CreatedDate = DateTime.UtcNow,
-                LastModifiedDate = DateTime.UtcNow,
-                IsApproved = false,
-                IsPremium = blog.IsPremium,
-            };
-
-            //Blog b = _mapper.Map<Blog>(blog);
-            //b.CreatedDate = DateTime.Now;
-            //b.LastModifiedDate = DateTime.Now;
+            Blog b = _mapper.Map<Blog>(blog);
+            b.CreatedDate = DateTime.UtcNow;
+            b.LastModifiedDate = DateTime.UtcNow;
 
             await _dbContext.Blogs.AddAsync(b);
             await _dbContext.SaveChangesAsync();
@@ -59,7 +48,7 @@ namespace BusinessLogic.Repositories
                 query = query.Where(blog => blog.AuthorId == authorDbId);
             }
 
-            var blogs = await query.Select(blog => new BlogDTO
+            List<BlogDTO> blogs = _mapper.Map<List<BlogDTO>>(await query.Select(blog => new BlogDTO
             {
                 Title = blog.Title,
                 Content = blog.Content,
@@ -69,7 +58,7 @@ namespace BusinessLogic.Repositories
                 AuthorId = blog.AuthorId,
                 BlogId = blog.BlogId,
                 CreatedAt = blog.CreatedDate.Date,
-            }).ToListAsync();
+            }).ToListAsync());
 
             return blogs;
         }
@@ -81,18 +70,8 @@ namespace BusinessLogic.Repositories
 
             if (blog != null)
             {
-
-                BlogDTO b = new BlogDTO
-                {
-                    BlogId = blog.BlogId,
-                    Title = blog.Title,
-                    Content = blog.Content,
-                    IsApproved = blog.IsApproved,
-                    IsPremium = blog.IsPremium,
-                    AuthorName = (await _dbContext.Authors.FirstOrDefaultAsync(author => author.AuthorId == blog.AuthorId)).Name,
-                    AuthorId = blog.AuthorId,
-                    CreatedAt = blog.CreatedDate.Date,
-                };
+                BlogDTO b = _mapper.Map<BlogDTO>(blog);
+                b.AuthorName = (await _dbContext.Authors.FirstOrDefaultAsync(author => author.AuthorId == blog.AuthorId)).Name;
 
                 return b;
             }
