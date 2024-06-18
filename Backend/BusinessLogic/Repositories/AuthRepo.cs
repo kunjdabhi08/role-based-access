@@ -4,21 +4,25 @@ using BusinessLogic.Interfaces;
 using DataAccess.Data;
 using BusinessLogic.Enums;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace BusinessLogic.Repositories
 {
     public class AuthRepo : IAuthRepo
     {
         private readonly AppDBContext _dbContext;
-        public AuthRepo(AppDBContext dbContext)
+        private readonly IMapper _mapper;
+        public AuthRepo(AppDBContext dbContext, IMapper map)
         {
             _dbContext = dbContext;
+            _mapper = map;
         }
         public async Task<User> Register(UserDTO user)
         {
             var salt = BCrypt.Net.BCrypt.GenerateSalt();
             User? Exists = await _dbContext.Users.FirstOrDefaultAsync(userFromDb => userFromDb.Email == user.Email && userFromDb.IsDeleted == false);
-            if (Exists != null) {
+            if (Exists != null)
+            {
                 throw new Exception("User Already Exists with this email");
             }
             User u = new User
@@ -31,9 +35,13 @@ namespace BusinessLogic.Repositories
 
             };
 
+            //User u = _mapper.Map<User>(user);
+            //u.RoleId = user.RoleId == (int)RoleTypeEnum.Author ? (int)RoleTypeEnum.Author : (int)RoleTypeEnum.Reader;
+            //u.Password = BCrypt.Net.BCrypt.HashPassword(user.Password, salt);
+            //u.CreatedAt = DateTime.UtcNow;
+
 
             await _dbContext.Users.AddAsync(u);
-            await _dbContext.SaveChangesAsync();
 
             if (u.RoleId == (int)RoleTypeEnum.Reader)
             {
@@ -48,7 +56,7 @@ namespace BusinessLogic.Repositories
                 await _dbContext.SaveChangesAsync();
             }
 
-            if(u.RoleId == (int)RoleTypeEnum.Author)
+            if (u.RoleId == (int)RoleTypeEnum.Author)
             {
                 Author author = new Author
                 {
@@ -77,11 +85,11 @@ namespace BusinessLogic.Repositories
                     user.Email = email;
                     user.Name = loginUser.Name;
                     user.RoleId = loginUser.RoleId;
-                    user.RoleName =  _dbContext.Roles.FirstOrDefault(role => role.RoleId == loginUser.RoleId)?.RoleName;
+                    user.RoleName = _dbContext.Roles.FirstOrDefault(role => role.RoleId == loginUser.RoleId)?.RoleName;
 
-                    if(loginUser.RoleId == (int)RoleTypeEnum.Author)
+                    if (loginUser.RoleId == (int)RoleTypeEnum.Author)
                     {
-                        user.AuthorId =  _dbContext.Authors.FirstOrDefault(author=> author.UserId == loginUser.UserId)?.AuthorId;
+                        user.AuthorId = _dbContext.Authors.FirstOrDefault(author => author.UserId == loginUser.UserId)?.AuthorId;
                     }
 
 

@@ -28,7 +28,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             break;
           case 401:
             commonService.openSnackBar(err.error.message)
-            router.navigate(["/"])
+            router.navigate([""])
             break;
           default:
             commonService.openSnackBar("Something went wrong! Please try after few minutes")

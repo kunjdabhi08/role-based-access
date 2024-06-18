@@ -8,8 +8,9 @@ import { CommonService } from '../../../../common/services/common.service';
 import { enviroment } from '../../../../../enviroments/enviroments';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root'  
 })
+
 export class AuthServiceService {
 
   private apiUrl = `${enviroment.API_URL}/auth`
@@ -40,8 +41,6 @@ export class AuthServiceService {
     return false;
   }
 
-
-
   public autoLogin = (): void => {
     var token = sessionStorage.getItem('token');
     if (token) {
@@ -49,7 +48,6 @@ export class AuthServiceService {
       this.router.navigate(["blog/blogs"]);
     }
   }
-
 
   public login = (email: string, password: string): Observable<ResponseModel<User>> => {
     return this.http.get<ResponseModel<User>>(`${this.apiUrl}?email=${email}&password=${password}`)

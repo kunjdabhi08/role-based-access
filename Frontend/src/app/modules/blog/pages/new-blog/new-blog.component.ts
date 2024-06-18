@@ -14,13 +14,13 @@ import { BlogService } from '../../services/blog.service';
 import { ScreenEnum } from '../../../../common/enums/screen.enum';
 import { CommonService } from '../../../../common/services/common.service';
 import { AuthServiceService } from '../../../auth/services/Auth/auth-service.service';
-
+import { NgxEditorConfig, Editor, Toolbar, NgxEditorModule } from 'ngx-editor';
 
 
 @Component({
   selector: 'app-new-blog',
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, TextFieldModule, MatSlideToggleModule, CommonModule],
+  imports: [MatFormFieldModule, MatInputModule, MatButtonModule, ReactiveFormsModule, TextFieldModule, MatSlideToggleModule, CommonModule, NgxEditorModule],
   templateUrl: './new-blog.component.html',
   styleUrl: './new-blog.component.css'
 })
@@ -32,6 +32,20 @@ export class NewBlogComponent {
   blogForm: FormGroup;
   user: User;
   id: number;
+  editor: Editor;
+  toolbar: Toolbar = [
+    ['bold', 'italic'],
+    ['underline', 'strike'],
+    ['code', 'blockquote'],
+    ['ordered_list', 'bullet_list'],
+    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
+    ['link', 'image'],
+    ['text_color', 'background_color'],
+    ['align_left', 'align_center', 'align_right', 'align_justify'],    
+    [ 'indent', 'outdent'],
+    ['superscript', 'subscript'],
+    ['undo', 'redo'],
+  ];
 
   constructor(
     private router: Router,
@@ -44,6 +58,7 @@ export class NewBlogComponent {
   }
 
   ngOnInit(): void {
+    this.editor = new Editor();
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     if (this.id) {
       this.title = "Edit Blog"
@@ -69,7 +84,7 @@ export class NewBlogComponent {
   public handleSubmit = (): void => {
     this.blogForm.markAllAsTouched();
     if (this.blogForm.valid) {
-      this.blogForm.value.content = JSON.stringify(this.blogForm.value.content);
+      // this.blogForm.value.content = JSON.stringify(this.blogForm.value.content);
       this.blogForm.value.authorId = this.user.authorId;
 
       if (!this.id) {
@@ -83,13 +98,11 @@ export class NewBlogComponent {
       } else {
         this.blogService.editBlog(this.blogForm.value, 1).subscribe({
           next: () => {
-
             this.commonService.openSnackBar("Blog Edited");
             this.router.navigate(["/blog/blogs"]);
           }
         })
       }
-
     }
   }
 
@@ -99,7 +112,7 @@ export class NewBlogComponent {
         next: (data) => {
           this.blogForm.patchValue({
             title: data.data.title,
-            content: JSON.parse(data.data.content),
+            content: data.data.content,
             isPremium: data.data.isPremium,
             blogId: data.data.blogId
           })

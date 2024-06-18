@@ -42,6 +42,7 @@ export class ProfileComponent {
         this.userService.subscribeUser(this.user.id, subscribe).subscribe({
           next: () => {
             this.user.roleId = checked ? roleTypeEnum.SubscribedReader : roleTypeEnum.Reader;
+            this.user.roleName = checked ? "Subscribed Reader" : "Reader";
             sessionStorage.setItem('user', this.commonService.encrypt(JSON.stringify(this.user)));
             this.commonService.openSnackBar(snackbarMsg);
           }

@@ -15,10 +15,10 @@ namespace BusinessLogic.MapperProfile
 
         public MapperProfile() {
             CreateMap<User, UserDTO>();
+            CreateMap<UserDTO, User>();
             CreateMap<Blog, BlogDTO>();
             CreateMap<BlogDTO, Blog>();
             CreateMap<Access, AccessDTO>();
-
         }
     }
 }

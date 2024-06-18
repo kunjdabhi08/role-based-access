@@ -2,7 +2,7 @@
 
 namespace DataAccess.Models
 {
-    public class Author
+    public class Author: BaseClass
     {
         public int AuthorId { get; set; }
 
@@ -16,7 +16,6 @@ namespace DataAccess.Models
         public int UserId {  get; set; }
 
         public int TotalBlogs { get; set; }
-
 
     }
 }

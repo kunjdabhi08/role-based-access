@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models
 {
-    public class User
+    public class User: BaseClass
     {
         [Key]
         public int UserId { get; set; }

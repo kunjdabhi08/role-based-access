@@ -4,6 +4,9 @@ using DataAccess.Data;
 using DataAccess.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using System.Text.Json.Serialization;
+using System.Net.Http.Json;
+using Newtonsoft.Json;
 
 namespace BusinessLogic.Repositories
 {
@@ -31,6 +34,9 @@ namespace BusinessLogic.Repositories
                 IsPremium = blog.IsPremium,
             };
 
+            //Blog b = _mapper.Map<Blog>(blog);
+            //b.CreatedDate = DateTime.Now;
+            //b.LastModifiedDate = DateTime.Now;
 
             await _dbContext.Blogs.AddAsync(b);
             await _dbContext.SaveChangesAsync();

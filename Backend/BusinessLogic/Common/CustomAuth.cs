@@ -2,9 +2,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using BusinessLogic.Interfaces;
 using DataAccess.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BusinessLogic.Common
@@ -41,7 +41,7 @@ namespace BusinessLogic.Common
                     Message = "Token not found"
                 })
                 {
-                    StatusCode = 401
+                    StatusCode = StatusCodes.Status401Unauthorized
                 };
                 return;
             }
@@ -54,7 +54,7 @@ namespace BusinessLogic.Common
                     Message = "Token is not valid"
                 })
                 {
-                    StatusCode = 401
+                    StatusCode = StatusCodes.Status401Unauthorized
                 };
                 return;
             }
@@ -73,7 +73,7 @@ namespace BusinessLogic.Common
                     Message = "Something went wrong"
                 })
                 {
-                    StatusCode = 401
+                    StatusCode = StatusCodes.Status401Unauthorized
                 };
                 return;
             }
@@ -94,7 +94,7 @@ namespace BusinessLogic.Common
                         Message = "Permission Denied"
                     })
                     {
-                        StatusCode = 403
+                        StatusCode = StatusCodes.Status403Forbidden
                     };
                     return;
                 }

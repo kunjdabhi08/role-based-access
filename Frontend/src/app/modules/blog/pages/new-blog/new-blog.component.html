@@ -24,13 +24,15 @@
         </div>
         <input type="text" formControlName="blogId" hidden />
         <div class="w-50">
-            <mat-form-field class="w-100">
-                <mat-label class="text-secondary">Content</mat-label>
-                <textarea formControlName="content" placeholder="Content" matInput rows="15"></textarea>
+            <div class="editor">    
+                <ngx-editor-menu [editor]="editor" [toolbar]="toolbar">
+                </ngx-editor-menu>
+                <ngx-editor [editor]="editor" formControlName="content">
+                </ngx-editor>
                 <mat-error *ngIf="blogForm.get('content')?.touched && f['content'].errors?.['required']">
                     Content is required
                 </mat-error>
-            </mat-form-field>
+            </div>
         </div>
         <div class="w-50">
             <mat-slide-toggle formControlName="isPremium">Members Only</mat-slide-toggle>

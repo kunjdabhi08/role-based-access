@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Models
 {
-    public class Reader
+    public class Reader: BaseClass
     {
         [Key]
         public int ReaderId { get; set; }

@@ -65,9 +65,6 @@ export class BlogsComponent implements OnInit, AfterViewInit {
     this.user = this.authService.getUser();
     this.fetchPermsisionForScreen(this.user.roleId, ScreenEnum.Admin);
     this.fetchBlogs();
-
-   
-
   }
 
   ngAfterViewInit(): void {
@@ -89,7 +86,7 @@ export class BlogsComponent implements OnInit, AfterViewInit {
           next: () => {
             this.commonService.openSnackBar("Blog Approved");
             this.fetchBlogs();
-            if(this.isFilterChecked){
+            if (this.isFilterChecked) {
               this.handleFilterChange(this.isFilterChecked)
             }
           }
@@ -138,7 +135,7 @@ export class BlogsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public checkPermission = ():void => {
+  public checkPermission = (): void => {
     this.commonService.fetchPermissionForScreen(this.user.roleId, ScreenEnum.User).subscribe({
       next: (data) => {
         if (data.success && !data.data.view) {
@@ -155,7 +152,7 @@ export class BlogsComponent implements OnInit, AfterViewInit {
       this.commonService.openForbiddenDialog(false);
       return;
     }
-    this.router.navigate([`/admin/blog/read/${id}`], { state: { isFromAdmin: true }})
+    this.router.navigate([`/admin/blog/read/${id}`], { state: { isFromAdmin: true } })
   }
 
   private fetchBlogs = (): void => {
