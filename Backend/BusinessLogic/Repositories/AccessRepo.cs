@@ -4,15 +4,19 @@ using BusinessLogic.Interfaces;
 using DataAccess.Data;
 using DataAccess.Models.DTO;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace BusinessLogic.Repositories
 {
     public class AccessRepo : IAccessRepo
     {
+        
         private readonly AppDBContext _dbContext;
-        public AccessRepo(AppDBContext context)
+        private readonly IMapper _mapper;
+        public AccessRepo(AppDBContext context, IMapper mapper)
         {
             _dbContext = context;
+            _mapper = mapper;
         }
 
         public Access? Get(int roleid, int screenid)
@@ -24,20 +28,33 @@ namespace BusinessLogic.Repositories
 
         public async Task<List<AccessDTO>>? Edit(List<AccessDTO> accesses)
         {
-            foreach(AccessDTO access in accesses)
+            List<Access?> accessToEdit = await _dbContext.Accesses.Where(acc => acc.RoleId == accesses[0].RoleId).ToListAsync();
+            foreach (Access access in accessToEdit)
             {
-                Access? accessToEdit = await _dbContext.Accesses.FirstOrDefaultAsync(acc => acc.RoleId == access.RoleId && acc.ScreenId == access.ScreenId);
-                if (access != null)
+                AccessDTO? editedAccess = accesses.Where(acc=> acc.RoleId == access.RoleId && acc.ScreenId == access.ScreenId).FirstOrDefault();
+                if (editedAccess != null)
                 {
-                    accessToEdit.Create = access.Create;
-                    accessToEdit.Edit = access.Edit;
-                    accessToEdit.Delete = access.Delete;
-                    accessToEdit.View = access.View;
-
-                    _dbContext.Accesses.Update(accessToEdit);
-                    await _dbContext.SaveChangesAsync();
+                    access.Create = editedAccess.Create;
+                    access.Edit = editedAccess.Edit;
+                    access.Delete = editedAccess.Delete;
+                    access.View = editedAccess.View;
+                }
+                if(editedAccess != null && editedAccess.ChildScreens.Count > 0)
+                {
+                    foreach(AccessDTO child in  editedAccess.ChildScreens)
+                    {
+                        Access childToEdit = accessToEdit.Where(ch => ch.RoleId == child.RoleId && ch.ScreenId == child.ScreenId).FirstOrDefault();
+                        if(childToEdit != null) {
+                            childToEdit.Create = !access.Create ? access.Create : child.Create;
+                            childToEdit.Edit = !access.Edit ? access.Edit : child.Edit;
+                            childToEdit.Delete = !access.Delete ? access.Delete : child.Delete;
+                            childToEdit.View = !access.View ? access.View : child.View;
+                        }
+                    }
                 }
             }
+            _dbContext.Accesses.UpdateRange(accessToEdit);
+            await _dbContext.SaveChangesAsync();
             
 
             return accesses;
@@ -46,7 +63,7 @@ namespace BusinessLogic.Repositories
         
         public async Task<List<AccessDTO>> Get(int roleId)
         {
-            List<AccessDTO> access =  await _dbContext.Accesses.Where(acc => acc.RoleId == roleId).Select(acc => new AccessDTO
+            List<AccessDTO> access = await _dbContext.Accesses.Where(acc => acc.RoleId == roleId && acc.ParentScreen == null).Select(acc => new AccessDTO
             {
                 AccessId = acc.AccessId,
                 RoleId = acc.RoleId,
@@ -57,6 +74,17 @@ namespace BusinessLogic.Repositories
                 Delete = acc.Delete,
                 View = acc.View,
                 Edit = acc.Edit,
+                ChildScreens = _dbContext.Accesses.Where(per => per.ParentScreen == acc.ScreenId).Select(per => new AccessDTO
+                {
+                    RoleId = per.RoleId,
+                    ScreenId = per.ScreenId,
+                    AccessId = per.AccessId,
+                    ScreenName = per.Screen.ScreenName,
+                    Create = per.Create,
+                    Delete = per.Delete,
+                    View = per.View,
+                    Edit = per.Edit,
+                }).ToList(),
             }).ToListAsync();
             return access;
         }

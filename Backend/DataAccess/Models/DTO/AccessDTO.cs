@@ -15,9 +15,9 @@ namespace DataAccess.Models.DTO
         [Required(ErrorMessage = "ScreenId is required")]
         public int ScreenId { get; set; }
 
-        public string RoleName { get; set; }
+        public string? RoleName { get; set; }
 
-        public string ScreenName { get; set; }  
+        public string? ScreenName { get; set; }  
 
         public int? AccessId { get; set; }
 
@@ -32,5 +32,7 @@ namespace DataAccess.Models.DTO
 
         [Required(ErrorMessage = "View Permission is required")]
         public bool View { get; set; }
+
+        public List<AccessDTO>? ChildScreens { get; set; }
     }
 }

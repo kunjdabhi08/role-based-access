@@ -1,5 +1,6 @@
 ﻿
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using BusinessLogic.Interfaces;
 using DataAccess.Models;
 using Microsoft.AspNetCore.Http;
@@ -62,7 +63,7 @@ namespace BusinessLogic.Common
 
 
             var roleClaim = validatedToken.Claims.Where(m => m.Type == "roleId").FirstOrDefault();
-
+            var roleName = validatedToken.Claims.Where(m=>m.Type == "role").FirstOrDefault().Value;
 
 
             if (roleClaim == null)
@@ -80,8 +81,21 @@ namespace BusinessLogic.Common
 
             var roleType = roleClaim.Value;
 
+            if (!_access.Contains(roleName))
+            {
+                context.Result = new JsonResult(new
+                {
+                    Success = false,
+                    Message = "Unauthorized"
+                })
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
+                return;
+            }
 
-            if (_access.Length > 0)
+
+            if (_access.Contains("Create") || _access.Contains("Edit") || _access.Contains("Delete") || _access.Contains("View"))
             {
                 var sc = context.HttpContext.Request.Query["screenId"];
                 Access access = accessService.Get(int.Parse(roleType), int.Parse(sc));

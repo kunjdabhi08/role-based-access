@@ -16,5 +16,7 @@ namespace BusinessLogic.Interfaces
         public Task<Blog> Delete(int id);
 
         public Task<Blog?> Approve(int blogId);
+
+        public Task<Blog?> Rate(int blogId, int rating);
     }
 }

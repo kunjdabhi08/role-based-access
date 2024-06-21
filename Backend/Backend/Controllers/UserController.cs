@@ -24,7 +24,7 @@ namespace Backend.Controllers
         /// <param name="id">id of the user to be deleted</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <returns>No content</returns>
-        [CustomAuth("Delete")]
+        [CustomAuth("Delete", "SuperAdmin", "Admin")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -60,7 +60,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <returns>list of all the user present in database and is not deleted</returns>
         [HttpGet]
-        [CustomAuth("View")]
+        [CustomAuth("View", "SuperAdmin", "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ResponseDTO<List<UserRespDTO>>>> Get()
@@ -74,7 +74,7 @@ namespace Backend.Controllers
                 return Ok(res);
             }
             catch (Exception Ex)
-            {
+            { 
                 res.Success = false;
                 res.Message = Ex.Message;
                 return BadRequest(res);
@@ -90,7 +90,7 @@ namespace Backend.Controllers
         /// <param name="subscribe">if true then request for subscription and if false then request for unsubscription</param>
         /// <returns></returns>
         [HttpPost("{id:int}")]
-        [CustomAuth("View")]
+        [CustomAuth("View", "Reader", "Subscribed Reader")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ResponseDTO<NoContent>>> Subscribe(int id, int subscribe)

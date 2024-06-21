@@ -30,5 +30,9 @@ namespace DataAccess.Models.DTO
         public bool IsPremium { get; set; }
 
         public DateTime? CreatedAt { get; set; }
+
+        public float Rating { get; set; }
+        
+        public int TotalRatings { get; set; }
     }
 }

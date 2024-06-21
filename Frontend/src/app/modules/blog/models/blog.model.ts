@@ -7,4 +7,6 @@ export interface BlogModel {
     isPremium: boolean;
     isApproved: boolean;
     createdAt: Date;
+    rating: number;
+    totalRatings: number;
 }

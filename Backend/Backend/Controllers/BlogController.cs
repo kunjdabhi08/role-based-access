@@ -4,12 +4,12 @@ using DataAccess.Models.DTO;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using BusinessLogic.Common;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend.Controllers
 {
     [Route("api/blogs/[action]")]
     [ApiController]
-    //[CustomAuth]
     public class BlogController : ControllerBase
     {
         private readonly IBlogRepo _blog;
@@ -18,14 +18,13 @@ namespace Backend.Controllers
             _blog = blog;
         }
 
-
         /// <summary>
         /// method for creating blog for authors
         /// </summary>
         /// <param name="blog">contains data of the blog like title, content and isMemberOnly or not.</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <returns>created blogs</returns>
-        [CustomAuth("Create")]
+        [CustomAuth("Create", "Author")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -66,7 +65,7 @@ namespace Backend.Controllers
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <param name="user">user is boolean field which will be true if user makes request</param>
         /// <returns>list of all blogs</returns>
-        [CustomAuth]
+        [CustomAuth("Admin", "SuperAdmin", "Reader", "Subscribed Reader", "Author")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -94,7 +93,7 @@ namespace Backend.Controllers
         /// <param name="id">the id of blog which needs to fetched</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <returns>a perticular blog corresponding to id</returns>
-        [CustomAuth("View")]
+        [CustomAuth("View", "Reader", "Subscribed Reader", "Admin", "SuperAdmin", "Author")]
         [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -132,7 +131,7 @@ namespace Backend.Controllers
         /// <param name="blog">will contain fields title, content, id and isPremium</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <returns>returns edited blog</returns>
-        [CustomAuth("Edit")]
+        [CustomAuth("Edit", "Author")]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -170,7 +169,7 @@ namespace Backend.Controllers
         /// <param name="id">id of the blog which needs to be deleted</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <returns>return void</returns>
-        [CustomAuth("Delete")]
+        [CustomAuth("Delete", "Author", "Admin", "SuperAdmin")]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -207,6 +206,7 @@ namespace Backend.Controllers
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <param name="authorId">id of the author whose blogs to be fetched</param>
         /// <returns>return list of blogs which is writtern by perticular author</returns>
+        [CustomAuth("Author")]
         [HttpGet("{authorId:int}")]
         public async Task<ActionResult<ResponseDTO<List<Blog>>>> GetByAuthor(int screenId, int? authorId)
         {
@@ -234,7 +234,7 @@ namespace Backend.Controllers
         /// <param name="blogId">id of blog which is to be approved</param>
         /// <param name="screenId">will contain id of the screen from which request has been made</param>
         /// <returns>returns approved blogs</returns>
-        [CustomAuth("Edit")]
+        [CustomAuth("Edit", "Admin", "SuperAdmin")]
         [HttpPut("{blogId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -255,6 +255,34 @@ namespace Backend.Controllers
 
                 res.Success = true;
                 res.Data = approvedBlog;
+                return Ok(res);
+            }
+            catch (Exception Ex)
+            {
+                res.Success = false;
+                res.Message = Ex.Message;
+                return BadRequest(res);
+            }
+        }
+
+
+        [CustomAuth("View", "Reader", "Subscribed Reader")]
+        [HttpPut("{blogId:int}")]
+        public async Task<ActionResult<ResponseDTO<NoContent>>> Rate(int blogId, int rating)
+        {
+            ResponseDTO<NoContent> res = new ResponseDTO<NoContent>();
+            try
+            {
+                Blog? ratedBlog = await _blog.Rate(blogId, rating);
+
+                if (ratedBlog == null)
+                {
+                    res.Success = false;
+                    res.Message = "Blog does not exist";
+                    return NotFound(res);
+                }
+
+                res.Success = true;
                 return Ok(res);
             }
             catch (Exception Ex)

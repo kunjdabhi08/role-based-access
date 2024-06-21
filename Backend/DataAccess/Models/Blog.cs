@@ -28,8 +28,12 @@ namespace DataAccess.Models
 
         public bool IsPremium { get; set; }
 
+        public int Views { get; set; }
+
         public DateTime CreatedDate { get; set; }
 
         public DateTime LastModifiedDate { get; set; }
+
+        public int TotalReviews {  get; set; }
     }
 }

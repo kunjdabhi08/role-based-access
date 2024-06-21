@@ -21,7 +21,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <param name="access">access param is a list of screens along with its permission and screen id</param>
         /// <returns>edited access</returns>
-        [CustomAuth("Edit")]
+        [CustomAuth("Edit", "SuperAdmin")]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -71,7 +71,7 @@ namespace Backend.Controllers
         /// <param name="roleid">roleid will container id of the selected role</param>
         /// <returns>all the accesses in database with this role id</returns>
         [HttpGet("{roleid:int}")]
-        [CustomAuth("View")]
+        [CustomAuth("View", "Admin", "SuperAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ResponseDTO<List<AccessDTO>>>> Get(int roleid)
@@ -101,6 +101,7 @@ namespace Backend.Controllers
         /// <param name="roleid">roleid is for id of the role for which we are getting the permission</param>
         /// <param name="screenid">screenid is id of the screen from which request has made</param>
         /// <returns>get access for perticular screen and perticular role</returns>
+        [CustomAuth("Admin", "SuperAdmin", "Author", "Reader", "Subscribed Reader")]
         [HttpGet("{roleid:int}/{screenid:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

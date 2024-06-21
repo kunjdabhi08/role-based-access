@@ -9,9 +9,14 @@
         <p class="fs-5" style="white-space: pre-line" [innerHTML]="blog.content | safeHtml"></p>
     </div>
 
-    <button color="accent mt-2" mat-raised-button  (click)="handleBack()">
-        Back
-    </button>
+    <div class="d-flex gap-3">
+        <button color="primary mt-2" mat-raised-button  (click)="handleRating()">
+            Rate this blog
+        </button>
+        <button color="accent mt-2" mat-raised-button  (click)="handleBack()">
+            Back
+        </button>
+    </div>
 </div>
 
 

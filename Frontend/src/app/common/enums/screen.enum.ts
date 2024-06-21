@@ -6,5 +6,6 @@ export enum ScreenEnum {
     Author,
     Permission, 
     User,
-    Admin
+    Admin,
+    BlogRating
 }

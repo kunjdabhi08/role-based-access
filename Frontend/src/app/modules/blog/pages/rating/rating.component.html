@@ -1,0 +1,10 @@
+
+
+<div class="container mt-5">
+    <p class="fs-4 mb-3">Rate this blog</p>
+    <p>Rating: {{currentRating}}</p>
+    <mat-slider min="0" max="5" step="1" showTickMarks [discrete]="true">
+        <input matSliderThumb [(ngModel)]="value">
+    </mat-slider>
+    <button mat-raised-button (click)="handleRate()">Rate</button>
+</div>

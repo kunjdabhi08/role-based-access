@@ -44,5 +44,9 @@ export class BlogService {
     return this.http.put<ResponseModel<BlogModel>>(this.apiUrl + `/blogs/Approve/${blogId}?screenId=` + screenId, null)
   }
 
+  public rateBlog = (blogId: number, rating: number): Observable<ResponseModel<null>> => {
+    return this.http.put<ResponseModel<null>>(this.apiUrl + `/blogs/rate/${blogId}?rating=${rating}&screenId=${6}`, null)
+  }
+
 }
 

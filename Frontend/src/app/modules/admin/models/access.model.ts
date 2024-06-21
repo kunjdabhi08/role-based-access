@@ -1,10 +1,6 @@
-
-
-
 export interface AccessModel {
     roleId: number;
     screenId: number;
-    accesses: boolean[];
     roleName: string;
     screenName: string;
     accessId: number;
@@ -12,4 +8,5 @@ export interface AccessModel {
     edit: boolean;
     view: boolean;
     delete: boolean;
+    childScreens: AccessModel[]
 }

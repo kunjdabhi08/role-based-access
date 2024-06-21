@@ -4,9 +4,6 @@ using DataAccess.Data;
 using DataAccess.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
-using System.Text.Json.Serialization;
-using System.Net.Http.Json;
-using Newtonsoft.Json;
 
 namespace BusinessLogic.Repositories
 {
@@ -72,6 +69,8 @@ namespace BusinessLogic.Repositories
             {
                 BlogDTO b = _mapper.Map<BlogDTO>(blog);
                 b.AuthorName = (await _dbContext.Authors.FirstOrDefaultAsync(author => author.AuthorId == blog.AuthorId)).Name;
+                b.Rating = blog.Rating;
+                b.TotalRatings = blog.TotalReviews;
 
                 return b;
             }
@@ -125,6 +124,26 @@ namespace BusinessLogic.Repositories
         }
 
 
+        public async Task<Blog?> Rate(int blogId,int rating)
+        {
+            Blog? blog = await _dbContext.Blogs.FirstOrDefaultAsync(blog => blog.BlogId == blogId && blog.IsDeleted == false);
 
+            if (blog != null)
+            {
+                float sum = (blog.Rating * blog.TotalReviews) + rating;
+                int totalReviews = blog.TotalReviews;
+                totalReviews++;
+
+
+                blog.Rating = sum / totalReviews;
+
+                blog.TotalReviews = totalReviews;
+
+                _dbContext.Blogs.Update(blog);
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return blog;
+        }
     }
 }

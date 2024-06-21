@@ -9,6 +9,7 @@ import { User } from '../../../auth/models/user.model';
 import { AuthServiceService } from '../../../auth/services/Auth/auth-service.service';
 import { roleTypeEnum } from '../../../../common/enums/role.enum';
 import { SafeHtmlPipe } from '../../../../common/pipes/safeHtml';
+import { CommonService } from '../../../../common/services/common.service';
 
 @Component({
   selector: 'app-blog',
@@ -28,7 +29,8 @@ export class BlogComponent implements OnInit {
     private route: ActivatedRoute, 
     private blogService: BlogService,
     private router: Router,
-    private authService: AuthServiceService
+    private authService: AuthServiceService,
+    private commonService: CommonService
   ) {
   }
 
@@ -46,12 +48,24 @@ export class BlogComponent implements OnInit {
     this.user.roleId === roleTypeEnum.Admin || roleTypeEnum.SuperAdmin ?  this.router.navigate(["/admin/blogs"]) :  this.router.navigate(["/blog/blogs"])
   }
 
-  private fetchBlogById = (id: number) => {
+  private fetchBlogById = (id: number): void => {
     let screenId = this.user.roleId === (roleTypeEnum.Admin || roleTypeEnum.SuperAdmin) ? ScreenEnum.Admin : ScreenEnum.Blog;
     this.blogService.getBlog(screenId, id).subscribe({
       next: (data)=> {
         this.blog = data.data;
-        // this.blog.content = JSON.parse(this.blog.content);
+      }
+    })
+  }
+
+  public handleRating = ():void => {
+    this.commonService.fetchPermissionForScreen(this.user.roleId, ScreenEnum.BlogRating).subscribe({
+      next: (data) => {
+        if(!data.data.view){
+          this.commonService.openForbiddenDialog(false);
+          return;
+        } else {
+          this.router.navigate([`/blog/rating/${this.id}`])
+        }
       }
     })
   }

@@ -26,5 +26,8 @@ namespace DataAccess.Models
 
         public bool View { get; set; }
 
+        [ForeignKey("Screen.ScreenId")]    
+        public int? ParentScreen { get; set; }
+
     }
 }

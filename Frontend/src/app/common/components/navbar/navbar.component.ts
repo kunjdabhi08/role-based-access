@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { AuthServiceService } from '../../../modules/auth/services/Auth/auth-service.service';
 import { CommonService } from '../../services/common.service';
 import { User } from '../../../modules/auth/models/user.model';
+import { roleTypeEnum } from '../../enums/role.enum';
 
 @Component({
   selector: 'app-navbar',
@@ -18,25 +19,37 @@ import { User } from '../../../modules/auth/models/user.model';
 export class NavbarComponent 
 {
 
-  public isLoggedIn$: Observable<boolean>;
   user: User;
 
   constructor(
     private authService: AuthServiceService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.isLoggedIn$ = this.authService.isAuth;
     if(this.user = this.authService.getUser()){
       this.authService.isAuth.next(true);
     }
-    
   }
-
 
   public handleLogout = (): void => {
     this.authService.logout();
     
+  }
+
+  public handleHome = ():void => {
+    switch(this.user.roleId){
+      case roleTypeEnum.Reader:
+      case roleTypeEnum.SubscribedReader:
+      case roleTypeEnum.Author:
+        this.router.navigate(["/blog/blogs"]);
+        break;
+      case roleTypeEnum.Admin:
+        this.router.navigate(["/admin/blogs"]);
+        break;
+      case roleTypeEnum.SuperAdmin:
+        this.router.navigate(["/admin/"])
+    }
   }
   
 }

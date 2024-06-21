@@ -21,7 +21,7 @@ namespace Backend.Controllers
         /// </summary>
         /// <returns>return all the roles</returns>
         [HttpGet]
-        [CustomAuth]
+        [CustomAuth("SuperAdmin", "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ResponseDTO<List<Role>>>> Get()
